@@ -1,9 +1,9 @@
 #include <fstream>
 #include <string>
 #include "cost.cpp"
-void input() {
-	
-	// 已分配服务链参数(源、目、流量、类型、实现方式、物理特征、NF 节点、路径)
+#include "print.cpp"
+void allocated_chains() {    // 已分配服务链参数(源、目、流量、类型、实现方式、物理特征、NF 节点、路径)
+
 	string s;
 	ifstream infile1; 
 	infile1.open("allocated_chains.txt");  
@@ -22,6 +22,7 @@ void input() {
 	          
 	        if(temp) {     //刚读取了数据  
 	            d[pos] = data;      //赋值   
+//	            cout<<data<<endl;
 	            data = 0;  
 				++pos;  
 	            temp = false;     //标志位复位  
@@ -37,12 +38,44 @@ void input() {
 	    c++;
     }  
 	infile1.close();
+}
+
+void allocated_paths() {
+	string s;
+	ifstream infile3; 
+    infile3.open("allocated_paths.txt"); 
+	int c = 0; 
+    while(getline(infile3, s)) {  
+    	bool temp = false;
+    	int pos = 0, data = 0;
+        for(int i = 0; i < s.length(); ++i) {  
+	        while((s[i]>='0')&&(s[i]<='9')) {      //当前字符是数字   
+	            temp = true;      //读数据标志位置位  
+	            data *= 10;  
+	            data += (s[i]-'0');       //字符在系统以ASCII码存储，要得到其实际值必须减去‘0’的ASCII值  
+	            ++i;  
+	        }  
+	          
+	        if(temp) {     //刚读取了数据  
+	            Allocated_Chains[c].path[pos] = data;      //赋值   
+	            Allocated_Chains[c].update_path[pos++] = data;
+	            data = 0;   
+	            temp = false;     //标志位复位  
+	        }  
+	    } 
+
+	    c++;
+    }  
 	
-	
-	// 输入服务链参数(源、目、类型) 
+	infile3.close();
+}
+
+void input_chains() {    // 输入服务链参数(源、目、类型) 
+
+	string s;
 	ifstream infile2; 
     infile2.open("input_chains.txt"); 
-	c = 0; 
+	int c = 0; 
     while(getline(infile2, s)) {  
     	bool temp = false;
     	int pos = 0, data = 0;
@@ -68,7 +101,17 @@ void input() {
 	    c++;
     }  
 	infile2.close();
+}
 
+void read() {
+	
+	allocated_chains();
+	allocated_paths();
+	
+	input_chains();
+
+	
+	
 	// 服务链类型对应的实现方法 
 	memcpy(chain_types[0], Firewall, sizeof(Firewall));
 	memcpy(chain_types[1], StrictFirewall, sizeof(StrictFirewall));
