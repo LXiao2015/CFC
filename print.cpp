@@ -9,7 +9,7 @@ void printChoice() {
 		cout<<endl;
 	}
 	cout<<endl;
-	for(int c: realc) {
+	for(int c = 0; c < NUM_OF_ALLOCATED_CHAINS; ++c) {
 		if(c < 0) {
 			break;
 		}

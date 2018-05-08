@@ -28,33 +28,57 @@ bool checkTraffic(int path[], int update_path[], int demand) {
 
 void chooseIns(int i, bool *nf_done, struct CFC Chains[]) {
 	int type = Chains[i].service_type;    // 五种服务链中的哪一种	
-	int rd = (Chains[i].ins + rand()%(num_of_ins[type]-1) + 1) % num_of_ins[type];
-	Chains[i].update_ins = rd;    // 选择一种实现方式(考虑服务链分配失败) 
-//	cout<<"第"<<i+1<<"条服务链："<<type<<" "<<Chains[i].ins<<endl; 
+//	int rd = (Chains[i].ins + rand()%(num_of_ins[type]-1) + 1) % num_of_ins[type];
+
+	Chains[i].update_ins = rand()%num_of_ins[type];    // 选择一种实现方式(考虑服务链分配失败) 
+//	cout<<"第"<<i+1<<"条服务链："<<type<<" "<<Chains[i].ins<<" "<<Chains[i].update_ins<<endl; 
 
 	int phy = 0;    // 第 n 个物理特征
 	for(int f : phy_feature_set) {
-//		cout<<chain_types[type][Chains[i].ins][f]<<endl;
+
 		if(chain_types[type][Chains[i].update_ins][f] == 1) {
-			rd = (Chains[i].node + rand()%(4-1) + 1) % 4;
-			Chains[i].update_node = service_nodes[phy][rd];    // NF 节点序号 
+			*nf_done = false;
+//			cout<<"nf_done："<<*nf_done<<endl; 
+//			cout<<"物理特征："<<chain_types[type][Chains[i].ins][f]<<endl;
+			
+			Chains[i].update_node = service_nodes[phy][rand()%4];    // NF 节点序号 
+			Chains[i].update_phy = phy;
+//			cout<<"新节点："<<Chains[i].update_node<<endl;
 			if(RS[Chains[i].update_node-37] <= 0) {
+//				cout<<"新节点用不了"<<endl;
 				Chains[i].update_node = Chains[i].node;
 				Chains[i].update_ins = Chains[i].ins;
+				Chains[i].update_phy = Chains[i].phy;
 				return;
 			}
-//			cout<<Chains[i].node<<endl;
-			Chains[i].update_phy = phy;
-			*nf_done = false;
+			
+			if(Chains[i].ins != Chains[i].update_ins) {
+//				cout<<"新旧两种实现方式不同"<<endl;
+				if(Chains[i].node > 0) {
+//					cout<<"采用旧节点："<<Chains[i].node<<endl;
+					Chains[i].update_node = Chains[i].node;
+				}
+//				cout<<"return"<<endl;
+			}
+
+//			cout<<Chains[i].update_node<<endl;
+			
+			
 			return;
 		}
-		++phy;
 	}
- 
+ 	phy++;
 }
 
 void choosePath(int i, bool *nf_done, struct CFC Chains[]) {
-
+//	cout<<*nf_done<<" "<<Chains[i].update_node<<endl; 
+//	cout<<Chains[i].update_node<<endl;
+	if(Chains[i].ins != Chains[i].update_ins && Chains[i].phy >= 0 && Chains[i].update_phy >= 0) {
+		Chains[i].update_phy = Chains[i].phy;
+		memcpy(Chains[i].update_path, Chains[i].path, 4*MAX_PATH_LENGTH);
+		return;
+	} 
+//	cout<<*nf_done<<endl; 
 	int step = 0; 
 	int src_sw = (Chains[i].src-1)/3 + 28;
 	int sink_sw = (Chains[i].sink-1)/3 + 28;
@@ -90,7 +114,7 @@ void choosePath(int i, bool *nf_done, struct CFC Chains[]) {
 	Chains[i].update_path[step++] = s_RT;
 //	cout<<Chains[i].update_path[step-1]<<" ";
 //	memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%5], 4*4);
-	memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%1], 4*4);
+	memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%3], 4*4);
 //	cout<<"Router"<<" ";
 	for(; Chains[i].update_path[step] > 0; ++step) {}
 	
@@ -129,7 +153,7 @@ void choosePath(int i, bool *nf_done, struct CFC Chains[]) {
 //			cout<<Chains[i].update_path[step-1]<<" ";
 //	        memcpy(path + step, RT_Paths[s_RT-42][t_RT-42][0], 4*4);
 //			memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%5], 4*4);
-			memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%1], 4*4);
+			memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%3], 4*4);
 //			cout<<"Router"<<" ";
 			for(; Chains[i].update_path[step] > 0; ++step) {}
 			Chains[i].update_path[step++] = sink_sw;
@@ -139,7 +163,6 @@ void choosePath(int i, bool *nf_done, struct CFC Chains[]) {
 		}
 		
 	} 
-	
 	
 //	cout<<Chains[i].update_node<<endl;
 //	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
@@ -151,9 +174,13 @@ void choosePath(int i, bool *nf_done, struct CFC Chains[]) {
 		Chains[i].update_node = Chains[i].node;
 		Chains[i].update_ins = Chains[i].ins;
 		Chains[i].update_phy = Chains[i].phy;
-		cout<<"不够分配"<<endl;
+//		cout<<"不够分配"<<endl;
 	}
-
+//	cout<<Chains[i].update_node<<endl;
+//	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
+//		cout<<Chains[i].update_path[step]<<" ";
+//	}
+//	cout<<endl;
 }
 
 void init() {
@@ -322,13 +349,13 @@ int main() {
 	// 将所有新服务链的先选一种初始配置 
 	init();
 	
-	printChoice();
+//	printChoice();
 
 	// 选择参与此次调整的已分配服务链 
 //	classify();
 	
 	// 策略更新 
-	for(int times = 0; times < 1; ++times) {
+	for(int times = 0; times < 500; ++times) {
 //		cout<<"第"<<times<<"次："<<endl;
 		action();
 //		cout<<endl;

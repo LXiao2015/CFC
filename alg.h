@@ -94,7 +94,7 @@ enum phy_feature {
 
 int phy_feature_set[3] = {f3, f5, f6};
 
-int FW_nodes[NUM_OF_FIREWALL] = {37,38,39,40};
+int FW_nodes[NUM_OF_FIREWALL] = {37,38,39,40};    // 少了一个 41 以后再说 
 int IDP_nodes[NUM_OF_IDP] = {37,38,39,41};
 
 int *service_nodes[NUM_OF_NF] = {FW_nodes, IDP_nodes, IDP_nodes};
@@ -230,7 +230,7 @@ int RT_Paths[NUM_OF_ROUTER][NUM_OF_ROUTER][5][4]={0};
 int use_cost_of_node[NUM_OF_NODES] = {
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 
-	4, 4, 4, 1, 2, 
+	4, 4, 4, 4, 4, 
 	8, 8, 8, 8
 };
 
@@ -239,14 +239,14 @@ float resource_cost_of_node[NUM_OF_CLOUDS] = {2, 2, 2, 1, 3};
 //int chain_failure_cost[NUM_OF_CHAIN_TYPES] = {1, 2, 4, 8, 16};
 
 int feature_failure_cost[NUM_OF_CHAIN_TYPES][NUM_OF_FEATURES] = {
-	{64, 8, 32, 0, 0, 0},
-	{64, 0, 32, 0, 0, 0},
-	{64, 0, 0, 0, 0, 32},
+	{32, 8, 32, 0, 0, 0},
+	{32, 0, 32, 0, 0, 0},
+	{32, 0, 0, 0, 0, 32},
 	{64, 0, 0, 0, 64, 16},
 	{64, 0, 0, 0, 64, 0}
 };
 
-int update_msg_cost = 1;
+int update_msg_cost = 8;
 
 int num_of_realc = 0;
 

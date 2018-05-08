@@ -1,7 +1,8 @@
 #include <fstream>
 #include <string>
 #include "cost.cpp"
-#include "print.cpp"
+#include "traffic.cpp"
+
 void allocated_chains() {    // ÒÑ·ÖÅä·şÎñÁ´²ÎÊı(Ô´¡¢Ä¿¡¢Á÷Á¿¡¢ÀàĞÍ¡¢ÊµÏÖ·½Ê½¡¢ÎïÀíÌØÕ÷¡¢NF ½Úµã¡¢Â·¾¶)
 
 	string s;
@@ -31,10 +32,9 @@ void allocated_chains() {    // ÒÑ·ÖÅä·şÎñÁ´²ÎÊı(Ô´¡¢Ä¿¡¢Á÷Á¿¡¢ÀàĞÍ¡¢ÊµÏÖ·½Ê½¡¢Î
 	    Allocated_Chains[c].src = d[0];
 	    Allocated_Chains[c].sink = d[1];
 	    Allocated_Chains[c].service_type = d[2];
-	    Allocated_Chains[c].ins = d[3];
-	    Allocated_Chains[c].phy = d[4];
+	    Allocated_Chains[c].update_ins = Allocated_Chains[c].ins = d[3];
+	    Allocated_Chains[c].update_phy = Allocated_Chains[c].phy = d[4];
 	    Allocated_Chains[c].update_node = Allocated_Chains[c].node = d[5];
-	    Allocated_Chains[c].update_cost = Allocated_Chains[c].cost = cost(c, Allocated_Chains);
 	    c++;
     }  
 	infile1.close();
@@ -57,13 +57,21 @@ void allocated_paths() {
 	        }  
 	          
 	        if(temp) {     //¸Õ¶ÁÈ¡ÁËÊı¾İ  
-	            Allocated_Chains[c].path[pos] = data;      //¸³Öµ   
-	            Allocated_Chains[c].update_path[pos++] = data;
+	            Allocated_Chains[c].update_path[pos] = data;      //¸³Öµ   
+//				cout<<Allocated_Chains[c].update_path[pos];
+				pos++;
 	            data = 0;   
 	            temp = false;     //±êÖ¾Î»¸´Î»  
 	        }  
 	    } 
-
+//		cout<<Allocated_Chains[c].update_node<<endl;
+//		for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
+//			cout<<Allocated_Chains[c].update_path[step]<<" ";
+//		}
+//		cout<<endl;
+	    updateTraffic(Allocated_Chains[c].path, Allocated_Chains[c].update_path, Allocated_Chains[c].demand);
+	    memcpy(Allocated_Chains[c].path, Allocated_Chains[c].update_path, 4*MAX_PATH_LENGTH);
+		Allocated_Chains[c].update_cost = Allocated_Chains[c].cost = cost(c, Allocated_Chains); 
 	    c++;
     }  
 	
@@ -105,13 +113,6 @@ void input_chains() {    // ÊäÈë·şÎñÁ´²ÎÊı(Ô´¡¢Ä¿¡¢ÀàĞÍ)
 
 void read() {
 	
-	allocated_chains();
-	allocated_paths();
-	
-	input_chains();
-
-	
-	
 	// ·şÎñÁ´ÀàĞÍ¶ÔÓ¦µÄÊµÏÖ·½·¨ 
 	memcpy(chain_types[0], Firewall, sizeof(Firewall));
 	memcpy(chain_types[1], StrictFirewall, sizeof(StrictFirewall));
@@ -133,4 +134,10 @@ void read() {
 	memcpy(RT_Paths[3][1], RT4_RT2, sizeof(RT4_RT2));
 	memcpy(RT_Paths[3][2], RT4_RT3, sizeof(RT4_RT3));
 	
+	allocated_chains();
+	allocated_paths();
+	
+	
+	input_chains();
+
 }
