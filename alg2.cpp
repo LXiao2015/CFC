@@ -5,7 +5,6 @@
 #include "alg.h"
 #include "read_chains.cpp" 
 #include "print.cpp"
-//#include "print.cpp" 
 
 bool checkTraffic(int path[], int update_path[], int demand) {
 	bool flag = true;
