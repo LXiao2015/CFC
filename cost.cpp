@@ -14,7 +14,7 @@ double cost(int i, struct CFC Chains[]) {
 		CFF += (1 - chain_types[Chains[i].service_type][Chains[i].update_ins][j]) * feature_failure_cost[Chains[i].service_type][j];
 	}
 //	cout<<endl;
-	CU += (1 - (int)(Chains[i].update_node == Chains[i].node)) * update_msg_cost;    // 这个是瞎写的, 应该与最开始分配的结果比较 
+	CU += (1 - (int)(Chains[i].update_node == Chains[i].ini_node)) * update_msg_cost;    // 这个是瞎写的, 应该与最开始分配的结果比较 
 	
 //	cout<<Chains[i].service_type<<" "<<Chains[i].update_ins<<endl;
 //	cout<<"NF："<<Chains[i].update_node<<endl;

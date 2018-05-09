@@ -34,6 +34,7 @@ void chooseIns(int i, bool *nf_done, struct CFC Chains[]) {
 //	cout<<"第"<<i+1<<"条服务链："<<type<<" "<<Chains[i].ins<<" "<<Chains[i].update_ins<<endl; 
 
 	int phy = 0;    // 第 n 个物理特征
+	Chains[i].update_node = 0;
 	for(int f : phy_feature_set) {
 
 		if(chain_types[type][Chains[i].update_ins][f] == 1) {
@@ -63,11 +64,12 @@ void chooseIns(int i, bool *nf_done, struct CFC Chains[]) {
 
 //			cout<<Chains[i].update_node<<endl;
 			
-			
 			return;
 		}
 	}
  	phy++;
+
+ 		
 }
 
 void choosePath(int i, bool *nf_done, struct CFC Chains[]) {
@@ -256,6 +258,7 @@ void update(int i, struct CFC Chains[]) {
 	memcpy(Chains[i].path, Chains[i].update_path, 4*MAX_PATH_LENGTH);
 //	cout<<"cost变化："<<Chains[i].cost<<" "<<Chains[i].update_cost<<endl;
 	Chains[i].cost = Chains[i].update_cost;
+	Chains[i].ins = Chains[i].update_ins;
 }
 
 void action() { 
@@ -292,6 +295,7 @@ void action() {
 		Allocated_Chains[c].update_cost = cost(c, Allocated_Chains);
 	}
 	
+//	double max_perform = -100.0;
 	double max_perform = 0.0;
 	int to_be_updated = -1, i = 0;
 	for(; i < NUM_OF_INPUT_CHAINS; ++i) {
@@ -352,10 +356,10 @@ int main() {
 //	printChoice();
 
 	// 选择参与此次调整的已分配服务链 
-//	classify();
+	classify();
 	
 	// 策略更新 
-	for(int times = 0; times < 500; ++times) {
+	for(int times = 0; times < 2000; ++times) {
 //		cout<<"第"<<times<<"次："<<endl;
 		action();
 //		cout<<endl;

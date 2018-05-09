@@ -68,8 +68,9 @@ int BasicDPI[3][NUM_OF_FEATURES] = {
 
 int FullDPI[3][NUM_OF_FEATURES] = {
 	{0,0,0,0,0,0},
-	{1,0,0,1,1,0},
-	{1,0,0,1,0,1}
+	{1,0,0,1,0,1},
+	{1,0,0,1,1,0}
+	
 };
 
 int StrictFullDPI[3][NUM_OF_FEATURES] = {
@@ -106,6 +107,7 @@ struct CFC {
 	int ins = 0;
 	int phy = -1;    // 第几个物理特征 
 	int node = 0;
+	int ini_node = 0;
 	int demand = 1;    // 暂时固定
 	int path[MAX_PATH_LENGTH] = {0};    // 最长会有 14 个点
 	double cost = 0.0;
@@ -246,7 +248,7 @@ int feature_failure_cost[NUM_OF_CHAIN_TYPES][NUM_OF_FEATURES] = {
 	{64, 0, 0, 0, 64, 0}
 };
 
-int update_msg_cost = 8;
+int update_msg_cost = 4;
 
 int num_of_realc = 0;
 
