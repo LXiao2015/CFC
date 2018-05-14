@@ -88,8 +88,8 @@ void choosePath(int i, bool *nf_done, struct CFC Chains[]) {
 	int s_RT = sw_RT[src_sw - 28]; 
 	Chains[i].update_path[step++] = s_RT;
 //	cout<<Chains[i].update_path[step-1]<<" ";
-//	memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%5], 4*4);
-	memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%1], 4*4);
+	memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%5], 4*4);
+//	memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%1], 4*4);
 //	cout<<"Router"<<" ";
 	for(; Chains[i].update_path[step] > 0; ++step) {}
 	
@@ -127,8 +127,8 @@ void choosePath(int i, bool *nf_done, struct CFC Chains[]) {
 			Chains[i].update_path[step++] = s_RT;
 //			cout<<Chains[i].update_path[step-1]<<" ";
 //	        memcpy(path + step, RT_Paths[s_RT-42][t_RT-42][0], 4*4);
-//			memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%5], 4*4);
-			memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%1], 4*4);
+			memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%5], 4*4);
+//			memcpy(Chains[i].update_path + step, RT_Paths[s_RT-42][t_RT-42][rand()%1], 4*4);
 //			cout<<"Router"<<" ";
 			for(; Chains[i].update_path[step] > 0; ++step) {}
 			Chains[i].update_path[step++] = sink_sw;

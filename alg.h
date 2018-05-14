@@ -16,36 +16,6 @@ const int NUM_OF_ROUTER = 4;
 const int NUM_OF_IDP = 4;
 const int NUM_OF_NF = 3;
 
-/* 定义（原论文）五种服务链不同实现方式的feature选择 */
- 
-//int Firewall[3][NUM_OF_FEATURES] = {
-//	{0,0,0,0,0,0,0,0},
-//	{1,1,0,0,0,0,0,0},
-//	{1,0,1,0,0,0,0,0}
-//};
-//
-//int StrictFirewall[2][NUM_OF_FEATURES] = {
-//	{0,0,0,0,0,0,0,0},
-//	{1,0,1,0,0,0,0,0}
-//};
-//
-//int SampledDPI[3][NUM_OF_FEATURES] = {
-//	{0,0,0,0,0,0,0,0},
-//	{1,0,0,1,1,0,0,0},
-//	{1,0,0,1,0,1,0,0}
-//};
-//
-//int FullDPI[3][NUM_OF_FEATURES] = {
-//	{0,0,0,0,0,0,0,0},
-//	{1,0,0,1,1,0,0,0},
-//	{1,0,0,1,0,1,0,0}
-//};
-//
-//int StrictFullDPI[3][NUM_OF_FEATURES] = {
-//	{0,0,0,0,0,0,0,0},
-//	{1,0,0,1,1,0,0,0}
-//};
-
 /* 定义（新模型）五种服务链不同实现方式的feature选择 */
 
 int Firewall[3][NUM_OF_FEATURES] = {
@@ -100,6 +70,13 @@ int IDP_nodes[NUM_OF_IDP] = {37,38,39,41};
 
 int *service_nodes[NUM_OF_NF] = {FW_nodes, IDP_nodes, IDP_nodes};
 
+struct Update {
+	int uphy = -1;
+	int unode = 0;
+	int upath[MAX_PATH_LENGTH] = {0};
+	double ucost;
+};
+
 struct CFC {
 	int src;
 	int sink;
@@ -112,11 +89,12 @@ struct CFC {
 	int path[MAX_PATH_LENGTH] = {0};    // 最长会有 14 个点
 	double cost = 0.0;
 	
-	int update_ins = 0;
-	int update_phy = -1;
-	int update_node = 0;
-	int update_path[MAX_PATH_LENGTH] = {0};
-	double update_cost;
+	struct Update update[3]; 
+//	int update_ins = 0;
+//	int update_phy = -1;
+//	int update_node = 0;
+//	int update_path[MAX_PATH_LENGTH] = {0};
+//	double update_cost;
 } Input_Chains[NUM_OF_INPUT_CHAINS], Allocated_Chains[NUM_OF_ALLOCATED_CHAINS]; 
 
 int realc[NUM_OF_ALLOCATED_CHAINS] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
