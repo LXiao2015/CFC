@@ -4,16 +4,14 @@ using namespace std;
 #define NUM_OF_INPUT_CHAINS 20
 #define NUM_OF_FEATURES 6
 #define NUM_OF_NODES 45
-#define NUM_OF_CLOUDS 5
+#define NUM_OF_NFNODES 5
 #define NUM_OF_ALLOCATED_CHAINS 10
 //#define NUM_OF_FEATURES 8
 
 #define MAX_PATH_LENGTH 16
 
 // 需要用const修饰, 不然error: array bound is not an integer constant before ']' token
-const int NUM_OF_FIREWALL = 5;
 const int NUM_OF_ROUTER = 4;
-const int NUM_OF_IDP = 4;
 const int NUM_OF_NF = 3;
 
 /* 定义（新模型）五种服务链不同实现方式的feature选择 */
@@ -65,10 +63,12 @@ enum phy_feature {
 
 int phy_feature_set[3] = {f3, f5, f6};
 
-int FW_nodes[NUM_OF_FIREWALL] = {37,38,39,40};    // 少了一个 41 以后再说 
-int IDP_nodes[NUM_OF_IDP] = {37,38,39,41};
+int FW_nodes[NUM_OF_NFNODES] = {37,38,39,40,41};    // 少了一个 41 以后再说 
+int IDP_nodes[NUM_OF_NFNODES] = {37,38,39,41,-1};
 
 int *service_nodes[NUM_OF_NF] = {FW_nodes, IDP_nodes, IDP_nodes};
+
+int count_of_nfnode[NUM_OF_NF] = {5, 4, 4};
 
 struct Update {
 	int uphy = -1;
@@ -106,7 +106,7 @@ int sw_edge[9] = {-1, -1, 37, -1, -1, 38, -1, -1, 39};
 int sw_RT[9] = {44, 44, 44, 45, 45, 45, 42, 42, 42};
 
 // NF 直连的交换机(0 代表没有直连的)(index = 节点号 - 37)
-int cloud_sw[NUM_OF_CLOUDS] = {30, 33, 36, -1, -1};
+int cloud_sw[NUM_OF_NFNODES] = {30, 33, 36, -1, -1};
 
 // RT 之间的拓扑(index = 节点号 - 42)(0 代表路径结束) 
 int RT1_RT2[5][4] = {
@@ -207,22 +207,22 @@ int RT4_RT3[5][4] = {
 
 int RT_Paths[NUM_OF_ROUTER][NUM_OF_ROUTER][5][4]={0};
 
-int use_cost_of_node[NUM_OF_NODES] = {
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 
-	4, 4, 4, 4, 4, 
-	8, 8, 8, 8
-};
+//int use_cost_of_node[NUM_OF_NODES] = {
+//	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+//	2, 2, 2, 2, 2, 2, 2, 2, 2, 
+//	4, 4, 4, 4, 4, 
+//	8, 8, 8, 8
+//};
 
-float resource_cost_of_node[NUM_OF_CLOUDS] = {2, 2, 2, 1, 3};
+float node_using_cost[NUM_OF_NFNODES] = {0, 0.2, 0.2, 0.2, 0.1};
 
 //int chain_failure_cost[NUM_OF_CHAIN_TYPES] = {1, 2, 4, 8, 16};
 
 int feature_failure_cost[NUM_OF_CHAIN_TYPES][NUM_OF_FEATURES] = {
-	{32, 8, 32, 0, 0, 0},
+	{32, 4, 32, 0, 0, 0},
 	{32, 0, 32, 0, 0, 0},
 	{32, 0, 0, 0, 0, 32},
-	{64, 0, 0, 0, 64, 16},
+	{64, 0, 0, 0, 64, 8},
 	{64, 0, 0, 0, 64, 0}
 };
 
@@ -231,11 +231,11 @@ int update_msg_cost = 4;
 int num_of_realc = 0;
 
 // 拓扑带宽
-int h_s = 20;
-int s_r = 40;
-int s_e = 40;
-int r_r = 60;
-int n_r = 60;
+int h_s = 8000;
+int s_r = 8000;
+int s_e = 8000;
+int r_r = 8000;
+int n_r = 16000;
 
 int BW[NUM_OF_NODES][NUM_OF_NODES] = {
 	/*
@@ -289,7 +289,7 @@ int BW[NUM_OF_NODES][NUM_OF_NODES] = {
 	*/
 	
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, s_e, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, s_e, 0, 0, 0, 0, 0, 0, n_r, n_r, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, s_e, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, s_e, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, n_r, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, n_r, 0, 0},
@@ -304,6 +304,9 @@ int BW[NUM_OF_NODES][NUM_OF_NODES] = {
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, s_r, s_r, s_r, 0, 0, 0, 0, 0, 0, 0, 0, r_r, r_r, r_r, 0}
 };
 
-int RS[NUM_OF_CLOUDS] = {20, 20, 20, 30, 40};
+int RS[NUM_OF_NFNODES] = {20, 20, 20, 30, 40};    // 这里需要改
+float resource_cost_of_node[NUM_OF_NFNODES] = {2, 2, 2, 1, 3};    // 这里需要改
 
 double U = 0.0;
+
+double prop[NUM_OF_NF] = {0.9, 0.8, 0.7}; 

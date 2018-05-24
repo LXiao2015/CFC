@@ -38,6 +38,7 @@ void allocated_chains() {    // ÒÑ·ÖÅä·şÎñÁ´²ÎÊı(Ô´¡¢Ä¿¡¢Á÷Á¿¡¢ÀàĞÍ¡¢ÊµÏÖ·½Ê½¡¢Î
 	    c++;
     }  
 	infile1.close();
+//	cout<<"over"<<endl;
 }
 
 void allocated_paths() {

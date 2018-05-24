@@ -33,7 +33,7 @@ void printBW() {
 }
 
 void printRS() {
-	for(int i = 0; i < NUM_OF_CLOUDS; ++i) {
+	for(int i = 0; i < NUM_OF_NFNODES; ++i) {
 		cout<<RS[i]<<" ";
 	}
 }
