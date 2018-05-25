@@ -5,6 +5,7 @@ using namespace std;
 #define NUM_OF_FEATURES 6
 #define NUM_OF_NODES 45
 #define NUM_OF_NFNODES 5
+#define NUM_OF_CLOUDS 4
 #define NUM_OF_ALLOCATED_CHAINS 10
 //#define NUM_OF_FEATURES 8
 
@@ -74,7 +75,7 @@ struct Update {
 	int uphy = -1;
 	int unode = 0;
 	int upath[MAX_PATH_LENGTH] = {0};
-	double ucost;
+	float uT;
 };
 
 struct CFC {
@@ -87,14 +88,13 @@ struct CFC {
 	int ini_node = 0;
 	int demand = 1;    // 暂时固定
 	int path[MAX_PATH_LENGTH] = {0};    // 最长会有 14 个点
-	double cost = 0.0;
 	
 	struct Update update[3]; 
 //	int update_ins = 0;
 //	int update_phy = -1;
 //	int update_node = 0;
 //	int update_path[MAX_PATH_LENGTH] = {0};
-//	double update_cost;
+	float fT;
 } Input_Chains[NUM_OF_INPUT_CHAINS], Allocated_Chains[NUM_OF_ALLOCATED_CHAINS]; 
 
 int realc[NUM_OF_ALLOCATED_CHAINS] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
@@ -214,7 +214,14 @@ int RT_Paths[NUM_OF_ROUTER][NUM_OF_ROUTER][5][4]={0};
 //	8, 8, 8, 8
 //};
 
+int node_used[NUM_OF_NFNODES] = {0};
+float CR = 0.0;
+float CI = 0.0;
+float CU = 0.0;
+float CFF = 0.0;
 float node_using_cost[NUM_OF_NFNODES] = {0, 0.2, 0.2, 0.2, 0.1};
+
+int node_vnf_demand[NUM_OF_CLOUDS][3]; 
 
 //int chain_failure_cost[NUM_OF_CHAIN_TYPES] = {1, 2, 4, 8, 16};
 
@@ -307,6 +314,6 @@ int BW[NUM_OF_NODES][NUM_OF_NODES] = {
 int RS[NUM_OF_NFNODES] = {20, 20, 20, 30, 40};    // 这里需要改
 float resource_cost_of_node[NUM_OF_NFNODES] = {2, 2, 2, 1, 3};    // 这里需要改
 
-double U = 0.0;
+double T = 0.0;
 
 double prop[NUM_OF_NF] = {0.9, 0.8, 0.7}; 

@@ -181,11 +181,9 @@ void init() {
 			
 			// 扣除资源和带宽 
 			updateTraffic(Input_Chains[i].path, Input_Chains[i].update[ins].upath, Input_Chains[i].demand);
-			if(Input_Chains[i].node > 0) {
-				RS[Input_Chains[i].node - 37] += Input_Chains[i].demand;
-			}
 			if(Input_Chains[i].update[ins].unode > 0) {
 				RS[Input_Chains[i].update[ins].unode - 37] -= Input_Chains[i].demand;
+				node_used[Input_Chains[i].update[ins].unode - 37] += 1;
 			}
 			memcpy(Input_Chains[i].path, Input_Chains[i].update[ins].upath, 4*MAX_PATH_LENGTH);
 	
@@ -193,41 +191,38 @@ void init() {
 			Input_Chains[i].node = Input_Chains[i].update[ins].unode;
 		}
 
-		Input_Chains[i].cost = cost(i, Input_Chains, ins);
+//		Input_Chains[i].cost = cost(i, Input_Chains, ins);
+//		T += Input_Chains[i].cost;
 //		cout<<"COST: "<<Input_Chains[i].cost<<endl;
 
 	}
 } 
 
 void classify() {
-	srand((unsigned)time(NULL));
-	double sumC = 0.0;
+//	cout<<"classify"<<endl;
+
 	int lowC = 1000, highC = 0;
 	for(int i = 0; i < NUM_OF_ALLOCATED_CHAINS; ++i) {
-		lowC = lowC >= Allocated_Chains[i].cost? Allocated_Chains[i].cost: lowC;
-		highC = highC <= Allocated_Chains[i].cost? Allocated_Chains[i].cost: highC;
-		sumC += Allocated_Chains[i].cost;
+		lowC = lowC >= Allocated_Chains[i].fT? Allocated_Chains[i].fT: lowC;
+		highC = highC <= Allocated_Chains[i].fT? Allocated_Chains[i].fT: highC;
 	}
 	int count = 0;
 	for(int i = 0; i < NUM_OF_ALLOCATED_CHAINS; ++i) {
 //		double Pc = pow(Allocated_Chains[i].cost/sumC, 1.0/(double)NUM_OF_ALLOCATED_CHAINS);
 //		double Pc = Allocated_Chains[i].cost/sumC;
-
-		double Pc = Allocated_Chains[i].cost;
-
-		int pr = rand()%(highC - lowC) + lowC;
-
-		if(pr - Pc < 0) {
-			realc[count++] = i;
-		}
-//		realc[count++] = i;  // 全加进来试试 
-
+//		float Pc = Allocated_Chains[i].fT;
+//		int pr = rand()%(highC - lowC) + lowC;
+//
+//		if(pr - Pc < 0) {
+//			realc[count++] = i;
+//		}
+		realc[count++] = i;  // 全加进来试试 
 	}
 	num_of_realc = count;
-//	cout<<"选择已分配的服务链："<<endl;
-//	for(int i = 0; realc[i] >= 0; ++i) {
-//		cout<<realc[i]<<" ";
-//	}
+	cout<<"选择已分配的服务链："<<endl;
+	for(int i = 0; realc[i] >= 0; ++i) {
+		cout<<realc[i]<<" ";
+	}
 }
 
 void update(int i, struct CFC Chains[], int ins) {
@@ -242,8 +237,12 @@ void update(int i, struct CFC Chains[], int ins) {
 	Chains[i].node = Chains[i].update[ins].unode;
 	memcpy(Chains[i].path, Chains[i].update[ins].upath, 4*MAX_PATH_LENGTH);
 //	cout<<"cost变化："<<Chains[i].cost<<" "<<Chains[i].update[ins].ucost<<endl;
-	Chains[i].cost = Chains[i].update[ins].ucost;
+	Chains[i].fT = Chains[i].update[ins].uT;
 	Chains[i].ins = ins;
+	
+	// update T
+	
+	cout<<T<<endl;
 }
 
 void action() { 
@@ -252,19 +251,18 @@ void action() {
 
 		for(int ins = 0; ins < num_of_ins[type]; ++ins) {
 			bool nf_done = true;
-	//		cout<<"选取节点..."<<endl;
+//			cout<<"选取节点..."<<endl;
 			chooseNode(i, &nf_done, Input_Chains, type, ins);
-	//		cout<<"done！"<<endl;
-	//		cout<<"清空路径..."<<endl;
+//			cout<<"done！"<<endl;
+//			cout<<"清空路径..."<<endl;
 			memset(Input_Chains[i].update[ins].upath, 0, MAX_PATH_LENGTH*4);
-	//		cout<<"done！"<<endl; 
-	//		cout<<"选取路径..."<<endl;
+//			cout<<"done！"<<endl; 
+//			cout<<"选取路径..."<<endl;
 			choosePath(i, &nf_done, Input_Chains, ins);
-	//		cout<<"done！"<<endl;
+//			cout<<"done！"<<endl;
 			
-			Input_Chains[i].update[ins].ucost = cost(i, Input_Chains, ins);
+			Input_Chains[i].update[ins].uT = single_cost(i, Input_Chains, ins);
 		}
-		
 	}
 	
 	for(int c: realc) {
@@ -285,10 +283,10 @@ void action() {
 			choosePath(c, &nf_done, Allocated_Chains, ins);
 	//		cout<<"done！"<<endl;
 			
-			Allocated_Chains[c].update[ins].ucost = cost(c, Allocated_Chains, ins);
-		}
-		
+			Allocated_Chains[c].update[ins].uT = single_cost(c, Allocated_Chains, ins);
+		}	
 	}
+//	cout<<"here"<<endl;
 	
 //	double max_perform = -100.0;
 //	double max_perform = 0.0;
@@ -300,7 +298,7 @@ void action() {
 		int type = Input_Chains[i].service_type;
 		for(int ins = 0; ins < num_of_ins[type]; ++ins) {
 //			Qf = exp(t - b*(Input_Chains[i].cost - Input_Chains[i].update[ins].ucost))/num_of_ins[type];
-			Qf = exp(t - b*(1/Input_Chains[i].update[ins].ucost - 1/Input_Chains[i].cost))/4;    // 这里的分母应该是可选的 node 
+			Qf = exp(t - b*(1/Input_Chains[i].update[ins].uT - 1/Input_Chains[i].fT))/4;    // 这里的分母应该是可选的 node 
 //			cout<<Qf<<endl;	
 //			if(Input_Chains[i].update[ins].ucost != Input_Chains[i].cost && min_perform > Qf) {
 			if(min_perform > Qf) {
@@ -317,9 +315,25 @@ void action() {
 			break;
 		}
 		int type = Allocated_Chains[c].service_type;    // 五种服务链中的哪一种
+		
 		for(int ins = 0; ins < num_of_ins[type]; ++ins) {
+			// node using cost
+			Allocated_Chains[c].update[ins].uT = T;
+			if(Allocated_Chains[c].update[ins].unode != Allocated_Chains[c].node) {
+				if(node_used[Allocated_Chains[c].node - 37] == 1) {
+					T -= node_using_cost[Allocated_Chains[c].node - 37];
+				}
+				if(node_used[Allocated_Chains[c].update[ins].unode - 37] == 0) {
+					T += node_using_cost[Allocated_Chains[c].update[ins].unode - 37];
+				}
+			}
+			
+			// vnf initiating cost
+			
+			
+			int new_cost = T - Allocated_Chains[c].fT + Allocated_Chains[c].update[ins].uT + CR;
 //			Qf = exp(t - b*(Allocated_Chains[c].cost - Allocated_Chains[c].update[ins].ucost))/num_of_ins[type];
-			Qf = exp(t - b*(1/Allocated_Chains[c].update[ins].ucost - 1/Allocated_Chains[c].cost))/4;    // 这里的分母应该是可选的 node
+			Qf = exp(t - b*(1/Allocated_Chains[c].update[ins].uT - 1/Allocated_Chains[c].fT))/4;    // 这里的分母应该是可选的 node
 //			cout<<Qf<<endl;		
 //			if(Allocated_Chains[c].update[ins].ucost != Allocated_Chains[c].cost && min_perform > Qf) {
 			if(min_perform > Qf) {
@@ -344,17 +358,9 @@ void action() {
 //		cout<<"done！"<<endl;
 	}
 	else {
-		cout<<U<<endl;
+		cout<<T<<endl;
 		return;
 	}
-	U = 0.0;
-	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
-		U += Input_Chains[i].cost;
-	}
-	for(int i = 0; i < NUM_OF_ALLOCATED_CHAINS; ++i) {
-		U += Allocated_Chains[i].cost;
-	}
-	cout<<U<<endl;
 }
 
 int main() {
@@ -371,11 +377,13 @@ int main() {
 //	cout<<"init over"<<endl;
 //	printChoice();
 
+	T = totalcost();
+	
 	// 选择参与此次调整的已分配服务链 
 	classify();
 //	
 	// 策略更新 
-	for(int times = 0; times < 500; ++times) {
+	for(int times = 0; times < 5; ++times) {
 //		cout<<"第"<<times<<"次："<<endl;
 		action();
 //		cout<<endl;

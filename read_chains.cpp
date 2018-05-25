@@ -35,6 +35,7 @@ void allocated_chains() {    // ÒÑ·ÖÅä·þÎñÁ´²ÎÊý(Ô´¡¢Ä¿¡¢Á÷Á¿¡¢ÀàÐÍ¡¢ÊµÏÖ·½Ê½¡¢Î
 	    Allocated_Chains[c].ins = d[3];
 	    Allocated_Chains[c].update[Allocated_Chains[c].ins].uphy = Allocated_Chains[c].phy = d[4];
 	    Allocated_Chains[c].update[Allocated_Chains[c].ins].unode = Allocated_Chains[c].node = d[5];
+	    node_used[d[5] - 37] += 1;
 	    c++;
     }  
 	infile1.close();
@@ -73,7 +74,7 @@ void allocated_paths() {
 		int ins = Allocated_Chains[c].ins;
 	    updateTraffic(Allocated_Chains[c].path, Allocated_Chains[c].update[ins].upath, Allocated_Chains[c].demand);
 	    memcpy(Allocated_Chains[c].path, Allocated_Chains[c].update[ins].upath, 4*MAX_PATH_LENGTH);
-		Allocated_Chains[c].update[ins].ucost = Allocated_Chains[c].cost = cost(c, Allocated_Chains, ins); 
+		Allocated_Chains[c].fT = Allocated_Chains[c].update[ins].uT = single_cost(c, Allocated_Chains, ins);    // °ÑÕâÀï»»Ò»¸öÆÀ¹Àº¯Êý 
 	    c++;
     }  
 	
@@ -135,6 +136,8 @@ void read() {
 	memcpy(RT_Paths[3][0], RT4_RT1, sizeof(RT4_RT1));
 	memcpy(RT_Paths[3][1], RT4_RT2, sizeof(RT4_RT2));
 	memcpy(RT_Paths[3][2], RT4_RT3, sizeof(RT4_RT3));
+	cout<<"?"<<endl;
+	memset(node_vnf_demand, 0, sizeof(node_vnf_demand));
 	
 	allocated_chains();
 	allocated_paths();
