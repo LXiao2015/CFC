@@ -1,5 +1,5 @@
 //#include <iostream>
-//#include <cstring>
+#include <cstring>
 //using namespace std;
 
 int lcs(int now[], int m, int former[], int n, int same[]) {  // 返回的 same 是逆序的路径 

@@ -85,8 +85,9 @@ struct CFC {
 	int ins = 0;
 	int phy = -1;    // 第几个物理特征 
 	int node = 0;
-	int ini_node = 0;
-	int demand = 1;    // 暂时固定
+//	int ini_node = 0;
+	float demand = 1.0;    // 暂时固定
+	int ini_path[MAX_PATH_LENGTH] = {0};
 	int path[MAX_PATH_LENGTH] = {0};    // 最长会有 14 个点
 	
 	struct Update update[3]; 
@@ -205,7 +206,7 @@ int RT4_RT3[5][4] = {
 	{43, 42, 44, -1}
 };
 
-int RT_Paths[NUM_OF_ROUTER][NUM_OF_ROUTER][5][4]={0};
+int RT_Paths[NUM_OF_ROUTER][NUM_OF_ROUTER][5][4];
 
 //int use_cost_of_node[NUM_OF_NODES] = {
 //	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
@@ -217,11 +218,20 @@ int RT_Paths[NUM_OF_ROUTER][NUM_OF_ROUTER][5][4]={0};
 int node_used[NUM_OF_NFNODES] = {0};
 float CR = 0.0;
 float CI = 0.0;
-float CU = 0.0;
-float CFF = 0.0;
+//float CU = 0.0;
+//float CFF = 0.0;
 float node_using_cost[NUM_OF_NFNODES] = {0, 0.2, 0.2, 0.2, 0.1};
+float node_init_cost = 0.4;
+float unit_rps[3] = {1000.0, 300.0, 100.0};
 
-int node_vnf_demand[NUM_OF_CLOUDS][3]; 
+float node_resource[NUM_OF_NF][2] = {
+	{1, 100},
+	{1, 200},
+	{1, 500}
+};
+
+float node_vnf_demand[NUM_OF_CLOUDS][3]; 
+int node_vnf_count[NUM_OF_CLOUDS][3];
 
 //int chain_failure_cost[NUM_OF_CHAIN_TYPES] = {1, 2, 4, 8, 16};
 
@@ -233,18 +243,18 @@ int feature_failure_cost[NUM_OF_CHAIN_TYPES][NUM_OF_FEATURES] = {
 	{64, 0, 0, 0, 64, 0}
 };
 
-int update_msg_cost = 4;
+float update_msg_cost = 4;
 
 int num_of_realc = 0;
 
 // 拓扑带宽
-int h_s = 8000;
-int s_r = 8000;
-int s_e = 8000;
-int r_r = 8000;
-int n_r = 16000;
+float h_s = 8000;
+float s_r = 8000;
+float s_e = 8000;
+float r_r = 8000;
+float n_r = 16000;
 
-int BW[NUM_OF_NODES][NUM_OF_NODES] = {
+float BW[NUM_OF_NODES][NUM_OF_NODES] = {
 	/*
 	 1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45
 	*/
@@ -311,9 +321,17 @@ int BW[NUM_OF_NODES][NUM_OF_NODES] = {
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, s_r, s_r, s_r, 0, 0, 0, 0, 0, 0, 0, 0, r_r, r_r, r_r, 0}
 };
 
-int RS[NUM_OF_NFNODES] = {20, 20, 20, 30, 40};    // 这里需要改
+float RS[NUM_OF_CLOUDS][2] = {
+	{20, 3000},
+	{20, 3000},
+	{20, 3000},
+	{80, 20000}
+};
+
+float CAP = 20000;
+
 float resource_cost_of_node[NUM_OF_NFNODES] = {2, 2, 2, 1, 3};    // 这里需要改
 
-double T = 0.0;
+float T = 0.0;
 
-double prop[NUM_OF_NF] = {0.9, 0.8, 0.7}; 
+float prop[NUM_OF_NF] = {0.9, 0.8, 0.7}; 

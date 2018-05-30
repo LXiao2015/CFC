@@ -1,7 +1,7 @@
 #include <fstream>
 #include <string>
 #include "cost.cpp"
-#include "traffic.cpp"
+#include "update.cpp"
 
 void allocated_chains() {    // 已分配服务链参数(源、目、流量、类型、实现方式、物理特征、NF 节点、路径)
 
@@ -74,8 +74,9 @@ void allocated_paths() {
 		int ins = Allocated_Chains[c].ins;
 	    updateTraffic(Allocated_Chains[c].path, Allocated_Chains[c].update[ins].upath, Allocated_Chains[c].demand);
 	    memcpy(Allocated_Chains[c].path, Allocated_Chains[c].update[ins].upath, 4*MAX_PATH_LENGTH);
-		Allocated_Chains[c].fT = Allocated_Chains[c].update[ins].uT = single_cost(c, Allocated_Chains, ins);    // 把这里换一个评估函数 
-	    c++;
+	    memcpy(Allocated_Chains[c].ini_path, Allocated_Chains[c].update[ins].upath, 4*MAX_PATH_LENGTH);
+		Allocated_Chains[c].fT = Allocated_Chains[c].update[ins].uT = singleCost(c, Allocated_Chains, ins);    // 把这里换一个评估函数 
+		c++;
     }  
 	
 	infile3.close();
@@ -124,20 +125,27 @@ void read() {
 	memcpy(chain_types[4], StrictFullDPI, sizeof(StrictFullDPI));
 	
 	// RT 之间的路径集合(index = 节点号 - 42)
+//	memset(RT_Paths[0][0], 0, sizeof(RT1_RT2));
 	memcpy(RT_Paths[0][1], RT1_RT2, sizeof(RT1_RT2));
 	memcpy(RT_Paths[0][2], RT1_RT3, sizeof(RT1_RT3));
 	memcpy(RT_Paths[0][3], RT1_RT4, sizeof(RT1_RT4));
+	
 	memcpy(RT_Paths[1][0], RT2_RT1, sizeof(RT2_RT1));
+//	memset(RT_Paths[1][1], 0, sizeof(RT1_RT2));
 	memcpy(RT_Paths[1][2], RT2_RT3, sizeof(RT2_RT3));
 	memcpy(RT_Paths[1][3], RT2_RT4, sizeof(RT2_RT4));
+	
 	memcpy(RT_Paths[2][0], RT3_RT1, sizeof(RT3_RT1));
 	memcpy(RT_Paths[2][1], RT3_RT2, sizeof(RT3_RT2));
+//	memset(RT_Paths[2][2], 0, sizeof(RT1_RT2));
 	memcpy(RT_Paths[2][3], RT3_RT4, sizeof(RT3_RT4));
+	
 	memcpy(RT_Paths[3][0], RT4_RT1, sizeof(RT4_RT1));
 	memcpy(RT_Paths[3][1], RT4_RT2, sizeof(RT4_RT2));
 	memcpy(RT_Paths[3][2], RT4_RT3, sizeof(RT4_RT3));
-	cout<<"?"<<endl;
-	memset(node_vnf_demand, 0, sizeof(node_vnf_demand));
+//	memset(RT_Paths[3][3], 0, sizeof(RT1_RT2));
+
+	memset(node_vnf_demand, 0.0, sizeof(node_vnf_demand));
 	
 	allocated_chains();
 	allocated_paths();
