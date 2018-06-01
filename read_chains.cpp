@@ -3,85 +3,124 @@
 #include "cost.cpp"
 #include "update.cpp"
 
-void allocated_chains() {    // 已分配服务链参数(源、目、流量、类型、实现方式、物理特征、NF 节点、路径)
+#define NUM_OF_PATH 47
 
+void allocated_chains() {
 	string s;
-	ifstream infile1; 
-	infile1.open("allocated_chains.txt");  
-	int c = 0;
-    while(getline(infile1, s)) {  
-    	bool temp = false;
-    	int pos = 0, data = 0;
-    	int d[6] = {0};
-        for(int i = 0; i < s.length(); ++i) {  
-	        while((s[i]>='0')&&(s[i]<='9')) {      //当前字符是数字   
-	            temp = true;      //读数据标志位置位  
-	            data *= 10;  
-	            data += (s[i]-'0');       //字符在系统以ASCII码存储，要得到其实际值必须减去‘0’的ASCII值  
-	            ++i;  
-	        }  
-	          
-	        if(temp) {     //刚读取了数据  
-	            d[pos] = data;      //赋值   
-//	            cout<<data<<endl;
-	            data = 0;  
-				++pos;  
-	            temp = false;     //标志位复位  
-	        }  
-	    } 
-	    Allocated_Chains[c].src = d[0];
-	    Allocated_Chains[c].sink = d[1];
-	    Allocated_Chains[c].service_type = d[2];
-	    Allocated_Chains[c].ins = d[3];
-	    Allocated_Chains[c].update[Allocated_Chains[c].ins].uphy = Allocated_Chains[c].phy = d[4];
-	    Allocated_Chains[c].update[Allocated_Chains[c].ins].unode = Allocated_Chains[c].node = d[5];
-	    node_used[d[5] - 37] += 1;
-	    c++;
-    }  
-	infile1.close();
-//	cout<<"over"<<endl;
-}
-
-void allocated_paths() {
-	string s;
-	ifstream infile3; 
-    infile3.open("allocated_paths.txt"); 
-	int c = 0; 
-    while(getline(infile3, s)) {  
-    	bool temp = false;
-    	int pos = 0, data = 0;
-        for(int i = 0; i < s.length(); ++i) {  
-	        while((s[i]>='0')&&(s[i]<='9')) {      //当前字符是数字   
-	            temp = true;      //读数据标志位置位  
-	            data *= 10;  
-	            data += (s[i]-'0');       //字符在系统以ASCII码存储，要得到其实际值必须减去‘0’的ASCII值  
-	            ++i;  
-	        }  
-	          
-	        if(temp) {     //刚读取了数据  
-	            Allocated_Chains[c].update[Allocated_Chains[c].ins].upath[pos] = data;      //赋值   
-//				cout<<Allocated_Chains[c].update_path[pos];
-				pos++;
-	            data = 0;   
-	            temp = false;     //标志位复位  
-	        }  
-	    } 
-//		cout<<Allocated_Chains[c].update_node<<endl;
-//		for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
-//			cout<<Allocated_Chains[c].update_path[step]<<" ";
-//		}
-//		cout<<endl;
-		int ins = Allocated_Chains[c].ins;
-	    updateTraffic(Allocated_Chains[c].path, Allocated_Chains[c].update[ins].upath, Allocated_Chains[c].demand);
-	    memcpy(Allocated_Chains[c].path, Allocated_Chains[c].update[ins].upath, 4*MAX_PATH_LENGTH);
-	    memcpy(Allocated_Chains[c].ini_path, Allocated_Chains[c].update[ins].upath, 4*MAX_PATH_LENGTH);
-		Allocated_Chains[c].fT = Allocated_Chains[c].update[ins].uT = singleCost(c, Allocated_Chains, ins);    // 把这里换一个评估函数 
-		c++;
-    }  
 	
-	infile3.close();
-}
+	ifstream infile1; 
+	infile1.open("raw.txt"); 
+	getline(infile1, s);
+	cout<<s<<endl;
+	int from[NUM_OF_PATH] = {0}, to[NUM_OF_PATH] = {0};
+	int pair_count = 0, i = 0;
+	while(s[i] != '\0') {
+		if(s[i] == '<') {
+			++i;
+			cout<<"<后的字符"<<i<<" "<<s[i]<<endl;
+			while(s[i] != ' ') {
+				from[pair_count] *= 10;
+				from[pair_count] += s[i] - '0';
+				++i;
+			}
+			cout<<from[pair_count]<<endl;
+			++i;
+			cout<<",后的字符"<<i<<" "<<s[i]<<endl;
+			while(s[i] != '>') {
+				to[pair_count] *= 10;
+				to[pair_count] += s[i] - '0';
+				++i;
+			}
+			cout<<to[pair_count]<<endl;
+			++pair_count;
+		}
+		++i;
+	}
+	for(pair_count = 0; pair_count < NUM_OF_PATH; ++pair_count) {
+		cout<<from[pair_count]<<" "<<to[pair_count]<<endl;
+	}
+} 
 
+//void allocated_chains() {    // 已分配服务链参数(源、目、流量、类型、实现方式、物理特征、NF 节点、路径)
+//
+//	string s;
+//	ifstream infile1; 
+//	infile1.open("allocated_chains.txt");  
+//	int c = 0;
+//    while(getline(infile1, s)) {  
+//    	bool temp = false;
+//    	int pos = 0, data = 0;
+//    	int d[6] = {0};
+//        for(int i = 0; i < s.length(); ++i) {  
+//	        while((s[i]>='0')&&(s[i]<='9')) {      //当前字符是数字   
+//	            temp = true;      //读数据标志位置位  
+//	            data *= 10;  
+//	            data += s[i]-'0';       //字符在系统以ASCII码存储，要得到其实际值必须减去‘0’的ASCII值  
+//	            ++i;  
+//	        }  
+//	          
+//	        if(temp) {     //刚读取了数据  
+//	            d[pos] = data;      //赋值   
+////	            cout<<data<<endl;
+//	            data = 0;  
+//				++pos;  
+//	            temp = false;     //标志位复位  
+//	        }  
+//	    } 
+//	    Allocated_Chains[c].src = d[0];
+//	    Allocated_Chains[c].sink = d[1];
+//	    Allocated_Chains[c].service_type = d[2];
+//	    Allocated_Chains[c].ins = d[3];
+//	    Allocated_Chains[c].update[Allocated_Chains[c].ins].uphy = Allocated_Chains[c].phy = d[4];
+//	    Allocated_Chains[c].update[Allocated_Chains[c].ins].unode = Allocated_Chains[c].node = d[5];
+//	    node_used[d[5] - 41] += 1;
+//	    c++;
+//    }  
+//	infile1.close();
+////	cout<<"over"<<endl;
+//}
+//
+//void allocated_paths() {
+//	string s;
+//	ifstream infile3; 
+//    infile3.open("allocated_paths.txt"); 
+//	int c = 0; 
+//    while(getline(infile3, s)) {  
+//    	bool temp = false;
+//    	int pos = 0, data = 0;
+//        for(int i = 0; i < s.length(); ++i) {  
+//	        while((s[i]>='0')&&(s[i]<='9')) {      //当前字符是数字   
+//	            temp = true;      //读数据标志位置位  
+//	            data *= 10;  
+//	            data += s[i]-'0';       //字符在系统以ASCII码存储，要得到其实际值必须减去‘0’的ASCII值  
+//	            ++i;  
+//	        }  
+//	          
+//	        if(temp) {     //刚读取了数据  
+//	            Allocated_Chains[c].update[Allocated_Chains[c].ins].upath[pos] = data;      //赋值   
+////				cout<<Allocated_Chains[c].update_path[pos];
+//				pos++;
+//	            data = 0;   
+//	            temp = false;     //标志位复位  
+//	        }  
+//	    } 
+////		cout<<Allocated_Chains[c].update_node<<endl;
+////		for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
+////			cout<<Allocated_Chains[c].update_path[step]<<" ";
+////		}
+////		cout<<endl;
+//		int ins = Allocated_Chains[c].ins;
+////		cout<<"扣除A - "<<c<<endl;
+//	    updateTraffic(Allocated_Chains[c].path, Allocated_Chains[c].update[ins].upath, Allocated_Chains[c].demand, -1, Allocated_Chains[c].phy);
+//	    memcpy(Allocated_Chains[c].path, Allocated_Chains[c].update[ins].upath, 4*MAX_PATH_LENGTH);
+//	    memcpy(Allocated_Chains[c].ini_path, Allocated_Chains[c].update[ins].upath, 4*MAX_PATH_LENGTH);
+//		Allocated_Chains[c].fT = Allocated_Chains[c].update[ins].uT = singleCost(c, Allocated_Chains, ins);    // 把这里换一个评估函数 
+//		c++;
+//    }  
+//	
+//	infile3.close();
+//}
+//
 void input_chains() {    // 输入服务链参数(源、目、类型) 
 
 	string s;
@@ -124,7 +163,7 @@ void read() {
 	memcpy(chain_types[3], FullDPI, sizeof(FullDPI));
 	memcpy(chain_types[4], StrictFullDPI, sizeof(StrictFullDPI));
 	
-	// RT 之间的路径集合(index = 节点号 - 42)
+	// RT 之间的路径集合(index = 节点号 - 37)
 //	memset(RT_Paths[0][0], 0, sizeof(RT1_RT2));
 	memcpy(RT_Paths[0][1], RT1_RT2, sizeof(RT1_RT2));
 	memcpy(RT_Paths[0][2], RT1_RT3, sizeof(RT1_RT3));
@@ -148,9 +187,7 @@ void read() {
 	memset(node_vnf_demand, 0.0, sizeof(node_vnf_demand));
 	
 	allocated_chains();
-	allocated_paths();
-	
+//	allocated_paths();
 	
 	input_chains();
-
 }

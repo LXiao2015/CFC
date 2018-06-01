@@ -60,13 +60,13 @@ void totalCost() {
 	T += CR;
 	
 	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
-		if(Input_Chains[i].node != 40) {
-			node_vnf_demand[Input_Chains[i].node - 37][Input_Chains[i].phy] += Input_Chains[i].demand;
+		if(Input_Chains[i].node != 41) {
+			node_vnf_demand[Input_Chains[i].node - 41][Input_Chains[i].phy] += Input_Chains[i].demand;
 		}
 	}
 	for(int c = 0; c < NUM_OF_ALLOCATED_CHAINS; ++c) {
 		if(Allocated_Chains[c].node != 40) {
-			node_vnf_demand[Allocated_Chains[c].node - 37][Allocated_Chains[c].phy] += Allocated_Chains[c].demand;
+			node_vnf_demand[Allocated_Chains[c].node - 41][Allocated_Chains[c].phy] += Allocated_Chains[c].demand;
 		}
 	}
 	for(int i = 0; i < NUM_OF_CLOUDS; ++i) {
@@ -87,25 +87,25 @@ float newCost(struct CFC Chains[], int i, int ins) {
 	float demand = Chains[i].demand;
 //	cout<<newT<<endl;
 	if(unode != node) {
-		if(node_used[node - 37] == 1) {
-			newT -= node_using_cost[node - 37];
+		if(node_used[node - 41] == 1) {
+			newT -= node_using_cost[node - 41];
 		}
-		if(node_used[unode - 37] == 0) {
-			newT += node_using_cost[unode - 37];
+		if(node_used[unode - 41] == 0) {
+			newT += node_using_cost[unode - 41];
 		}
 	}
 //	cout<<newT<<endl;
 	// vnf initiating cost
-	if(node != 40) {
-		newT -= (int)((node_vnf_demand[node - 37][phy] + unit_rps[phy] - 1)/unit_rps[phy]) * node_init_cost;
+	if(node != 41) {
+		newT -= (int)((node_vnf_demand[node - 41][phy] + unit_rps[phy] - 1)/unit_rps[phy]) * node_init_cost;
 //		cout<<newT<<endl;
-		newT += (int)((node_vnf_demand[node - 37][phy] - demand + unit_rps[phy] - 1)/unit_rps[phy]) * node_init_cost;
+		newT += (int)((node_vnf_demand[node - 41][phy] - demand + unit_rps[phy] - 1)/unit_rps[phy]) * node_init_cost;
 //		cout<<newT<<endl;
 	}
-	if(unode != 40) {
-		newT -= (int)((node_vnf_demand[unode - 37][uphy] + unit_rps[uphy] - 1)/unit_rps[uphy]) * node_init_cost;
+	if(unode != 41) {
+		newT -= (int)((node_vnf_demand[unode - 41][uphy] + unit_rps[uphy] - 1)/unit_rps[uphy]) * node_init_cost;
 //		cout<<newT<<endl;
-		newT += (int)((node_vnf_demand[unode - 37][uphy] + demand + unit_rps[uphy] - 1)/unit_rps[uphy]) * node_init_cost;
+		newT += (int)((node_vnf_demand[unode - 41][uphy] + demand + unit_rps[uphy] - 1)/unit_rps[uphy]) * node_init_cost;
 //		cout<<newT<<endl;
 	}
 //	cout<<newT<<endl;
