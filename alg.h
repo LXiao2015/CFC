@@ -1,15 +1,17 @@
 using namespace std;
 
 #define NUM_OF_CHAIN_TYPES 5
-#define NUM_OF_INPUT_CHAINS 20
+#define NUM_OF_INPUT_CHAINS 41
 #define NUM_OF_FEATURES 6
 #define NUM_OF_NODES 45
 #define NUM_OF_NFNODES 5
 #define NUM_OF_CLOUDS 4
-#define NUM_OF_ALLOCATED_CHAINS 10
+#define NUM_OF_ALLOCATED_CHAINS 15
 //#define NUM_OF_FEATURES 8
 
 #define MAX_PATH_LENGTH 16
+
+#define NUM_OF_PATH 94
 
 // 需要用const修饰, 不然error: array bound is not an integer constant before ']' token
 const int NUM_OF_ROUTER = 4;
@@ -17,37 +19,37 @@ const int NUM_OF_NF = 3;
 
 /* 定义（新模型）五种服务链不同实现方式的feature选择 */
 // 交换了 f5, f6 的位置, 与 CPLEX 版相同 
-int Firewall[3][NUM_OF_FEATURES] = {
+bool Firewall[3][NUM_OF_FEATURES] = {
 	{0,0,0,0,0,0},
 	{1,1,0,0,0,0},
 	{1,0,1,0,0,0}
 };
 
-int StrictFirewall[3][NUM_OF_FEATURES] = {
+bool StrictFirewall[3][NUM_OF_FEATURES] = {
 	{0,0,0,0,0,0},
 	{1,0,1,0,0,0},
 	{0,0,0,0,0,0}    // 凑整
 };
 
-int BasicDPI[3][NUM_OF_FEATURES] = {
+bool BasicDPI[3][NUM_OF_FEATURES] = {
 	{0,0,0,0,0,0},
 	{1,0,0,1,1,0},
 	{0,0,0,0,0,0}    // 凑整
 };
 
-int FullDPI[3][NUM_OF_FEATURES] = {
+bool FullDPI[3][NUM_OF_FEATURES] = {
 	{0,0,0,0,0,0},
 	{1,0,0,1,1,0},
 	{1,0,0,1,0,1}
 };
 
-int StrictFullDPI[3][NUM_OF_FEATURES] = {
+bool StrictFullDPI[3][NUM_OF_FEATURES] = {
 	{0,0,0,0,0,0},
 	{1,0,0,1,0,1},
 	{0,0,0,0,0,0}    // 凑整 
 };
 
-int chain_types[NUM_OF_CHAIN_TYPES][3][NUM_OF_FEATURES]={0};
+bool chain_types[NUM_OF_CHAIN_TYPES][3][NUM_OF_FEATURES] = {0};
 
 
 int num_of_ins[NUM_OF_CHAIN_TYPES] = {3, 2, 2, 3, 2};
@@ -86,7 +88,7 @@ struct CFC {
 	int phy = -1;    // 第几个物理特征 
 	int node = 0;
 //	int ini_node = 0;
-	float demand = 1.0;    // 暂时固定
+	float demand;    // 暂时固定
 	int ini_path[MAX_PATH_LENGTH] = {0};
 	int path[MAX_PATH_LENGTH] = {0};    // 最长会有 14 个点
 	
@@ -231,12 +233,12 @@ int node_vnf_count[NUM_OF_CLOUDS][3];
 int feature_failure_cost[NUM_OF_CHAIN_TYPES][NUM_OF_FEATURES] = {
 	{32, 4, 32, 0, 0, 0},
 	{32, 0, 32, 0, 0, 0},
-	{32, 0, 0, 0, 0, 32},
-	{64, 0, 0, 0, 64, 8},
-	{64, 0, 0, 0, 64, 0}
+	{32, 0, 0, 0, 32, 0},
+	{64, 0, 0, 0, 8, 64},
+	{64, 0, 0, 0, 0, 64}
 };
 
-float update_msg_cost = 4;
+float update_msg_cost = 0.2;
 
 int num_of_realc = 0;
 
@@ -329,6 +331,11 @@ float T = 0.0;
 
 float prop[NUM_OF_NF] = {0.9, 0.8, 0.7}; 
 
+int from[NUM_OF_PATH] = {0}, to[NUM_OF_PATH] = {0};
+
+float multiplier = 5;
+
+
 
 // 类型 实现方式 与对应的prop
 //0 0
@@ -347,4 +354,5 @@ float prop[NUM_OF_NF] = {0.9, 0.8, 0.7};
 //
 //4 0
 //4 1  0.7 
- 
+
+

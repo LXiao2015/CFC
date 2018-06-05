@@ -10,8 +10,9 @@ float singleCost(int i, struct CFC Chains[], int ins) {
 	float cff = 0.0, cu = 0.0;
 //	CF = chain_failure_cost[Input_Chains[i].service_type];
 	for(int j = 0; j < NUM_OF_FEATURES; ++j) {
-//		cout<<chain_types[Chains[i].service_type][Chains[i].update_ins][j]<<" ";
-		cff += (1 - chain_types[Chains[i].service_type][ins][j]) * feature_failure_cost[Chains[i].service_type][j];
+//		cout<<chain_types[Chains[i].service_type][ins][j]<<" ";
+		cff += (chain_types[Chains[i].service_type][ins][j] == true)? 0: feature_failure_cost[Chains[i].service_type][j];
+//		cout<<cff<<endl;
 	}
 //	cout<<endl;
 	int samepath[MAX_PATH_LENGTH] = {0};
@@ -36,9 +37,8 @@ float singleCost(int i, struct CFC Chains[], int ins) {
 //	cout<<"需要发送更新消息的点："<<count<<endl;
 	cu = count * update_msg_cost;
 	
-//	cout<<Chains[i].service_type<<" "<<Chains[i].ins<<endl;
-//	cout<<"NF："<<Chains[i].node<<endl;
-//	
+//	cout<<Chains[i].service_type<<" "<<ins<<endl;
+//	cout<<"NF："<<Chains[i].node<<endl;	
 //	cout<<"cff: "<<cff<<"  cu: "<<cu<<endl;
 	return cff + cu;
 }
@@ -53,39 +53,57 @@ void totalCost() {
 		T += Allocated_Chains[c].fT;
 //		cout<<T<<endl;
 	}
-	
+	cout << T << " ";
 	for(int i = 0; i < NUM_OF_NFNODES; ++i) {
 		CR += (node_used[i] > 0? 1: 0) * node_using_cost[i];
 	}
 	T += CR;
 	
 	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
-		if(Input_Chains[i].node != 41) {
-			node_vnf_demand[Input_Chains[i].node - 41][Input_Chains[i].phy] += Input_Chains[i].demand;
+		int i_node = Input_Chains[i].node, i_phy = Input_Chains[i].phy;
+		if(i_node != 41) {
+			node_vnf_demand[i_node - 42][i_phy] += Input_Chains[i].demand;
+//			node_vnf_count[i_node - 42][i_phy] = (int)(node_vnf_demand[i_node - 42][i_phy] / unit_rps[i_phy]);
 		}
 	}
 	for(int c = 0; c < NUM_OF_ALLOCATED_CHAINS; ++c) {
-		if(Allocated_Chains[c].node != 40) {
-			node_vnf_demand[Allocated_Chains[c].node - 41][Allocated_Chains[c].phy] += Allocated_Chains[c].demand;
+		int a_node = Allocated_Chains[c].node, a_phy = Allocated_Chains[c].phy;
+		if(a_node != 41) {
+			node_vnf_demand[a_node - 42][a_phy] += Allocated_Chains[c].demand;
+//			node_vnf_count[a_node - 42][a_phy] = (int)(node_vnf_demand[a_node - 42][a_phy] / unit_rps[a_phy]);
 		}
 	}
 	for(int i = 0; i < NUM_OF_CLOUDS; ++i) {
 		for(int j = 0; j < 3; ++j) {
-			CI += (int)(node_vnf_count[i][j] * node_init_cost);
+			CI += node_vnf_count[i][j] * node_init_cost;
 		}
 	}
 	T += CI;
 	
-//	cout<<CR<<" "<<CI<<" "<<T<<endl;
+//	cout<<"node_used："<<endl;
+//	for(int i = 0; i < NUM_OF_NFNODES; ++i) {
+//		cout<<node_used[i]<<" ";
+//	}
+//	cout<<endl<<"node_vnf_count："<<endl;
+//	for(int i = 0; i < NUM_OF_CLOUDS; ++i) {
+//		for(int j = 0; j < 3; ++j) {
+//			cout<<node_vnf_count[i][j]<<" ";
+//		}
+//	}
+//	cout << endl << CR << " " << CI << endl;
 }
 
 float newCost(struct CFC Chains[], int i, int ins) {
-	// node using cost
-	float newT = T;
 	int node = Chains[i].node, unode = Chains[i].update[ins].unode;
 	int phy = Chains[i].phy, uphy = Chains[i].update[ins].uphy;
+	if(node == unode && uphy == phy) {
+		return T;
+	}
+	
+	float newT = T;
 	float demand = Chains[i].demand;
-//	cout<<newT<<endl;
+//	cout << "here " << newT << endl;
+	// node using cost
 	if(unode != node) {
 		if(node_used[node - 41] == 1) {
 			newT -= node_using_cost[node - 41];
@@ -94,26 +112,22 @@ float newCost(struct CFC Chains[], int i, int ins) {
 			newT += node_using_cost[unode - 41];
 		}
 	}
-//	cout<<newT<<endl;
+//	cout << newT << endl;
 	// vnf initiating cost
-	if(node != 41) {
-		newT -= (int)((node_vnf_demand[node - 41][phy] + unit_rps[phy] - 1)/unit_rps[phy]) * node_init_cost;
-//		cout<<newT<<endl;
-		newT += (int)((node_vnf_demand[node - 41][phy] - demand + unit_rps[phy] - 1)/unit_rps[phy]) * node_init_cost;
-//		cout<<newT<<endl;
+	
+	if(node > 41) {
+		newT -= node_vnf_count[node - 42][phy] * node_init_cost;
+//		cout << newT << endl;
+		newT += (int)((node_vnf_demand[node - 42][phy] - demand + unit_rps[phy] - 1)/unit_rps[phy]) * node_init_cost;
+//		cout << newT << endl;
 	}
-	if(unode != 41) {
-		newT -= (int)((node_vnf_demand[unode - 41][uphy] + unit_rps[uphy] - 1)/unit_rps[uphy]) * node_init_cost;
-//		cout<<newT<<endl;
-		newT += (int)((node_vnf_demand[unode - 41][uphy] + demand + unit_rps[uphy] - 1)/unit_rps[uphy]) * node_init_cost;
-//		cout<<newT<<endl;
+	if(unode > 41) {
+		newT -= node_vnf_count[unode - 42][uphy] * node_init_cost;	
+//		cout << newT << endl;
+		newT += (int)((node_vnf_demand[unode - 42][uphy] + demand + unit_rps[uphy] - 1)/unit_rps[uphy]) * node_init_cost;
+//		cout << newT << " here" << endl;
 	}
 //	cout<<newT<<endl;
 	return newT;
 }
 
-//minimize 
-//    sum( c in cfc, j in Feature_Model ) (1 - f_choice[c][j]) * feature_failure_cost[c.type][j] +    // CF 有了 
-//    sum( n in nfnode ) used[n] * node_using_cost[n] +   
-//    sum( i in cnode, v in vnf_feature ) instance_count[i][v] * init_cost +    // CR
-//    sum( l in path, r in req ) flow[r][l] * update_msg_cost;    // CU 有了 

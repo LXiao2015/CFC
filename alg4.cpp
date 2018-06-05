@@ -180,6 +180,7 @@ void init() {
 		int type = Input_Chains[i].service_type;    // 五种服务链中的哪一种
 		int ins = rand()%num_of_ins[type];    // 选择一种实现方式(考虑服务链分配失败)
 //		Input_Chains[i].ins = ins;
+//		cout<<"I 初始 - "<<i<<endl;
 		if(ins != 0) {
 			chooseNode(i, &nf_done, Input_Chains, type, ins);   // 失败后恢复 
 			if(Input_Chains[i].update[ins].succ != false) {
@@ -196,6 +197,7 @@ void init() {
 				Input_Chains[i].node = Input_Chains[i].update[ins].unode;
 			}	
 		}
+ 
 		Input_Chains[i].fT = singleCost(i, Input_Chains, ins);
 	}
 } 
@@ -228,12 +230,46 @@ void classify() {
 }
 
 void update(int i, struct CFC Chains[], int ins, float update_cost) {
+	cout << "node_used：" << endl;
+	for(int i = 0; i < NUM_OF_NFNODES; ++i) {
+		cout << node_used[i] << " ";
+	}
+	cout << endl << "node_vnf_count：" << endl;
+	for(int i = 0; i < NUM_OF_CLOUDS; ++i) {
+		for(int j = 0; j < 3; ++j) {
+			cout << node_vnf_count[i][j] << " ";
+		}
+	}
+	cout << endl << "路径变化：" << endl;
+	
+	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
+		cout<<Chains[i].path[step]<<" ";
+	}
+	cout << endl;
+	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
+		cout<<Chains[i].update[ins].upath[step]<<" ";
+	}
+	cout << endl;
+	
+	cout << "节点选择变化：" << Chains[i].node << " " << Chains[i].update[ins].unode << endl;
 	updateTraffic(Chains[i].path, Chains[i].update[ins].upath, Chains[i].demand, Chains[i].phy, Chains[i].update[ins].uphy);
 	updateCapacity(Input_Chains, i, ins);
+	
+	cout << "node_used：" << endl;
+	for(int i = 0; i < NUM_OF_NFNODES; ++i) {
+		cout << node_used[i] << " ";
+	}
+	cout << endl << "node_vnf_count：" << endl;
+	for(int i = 0; i < NUM_OF_CLOUDS; ++i) {
+		for(int j = 0; j < 3; ++j) {
+			cout << node_vnf_count[i][j] << " ";
+		}
+	}
+	cout << endl;
 //	cout<<"更新："<<i<<endl;
 	Chains[i].node = Chains[i].update[ins].unode;
 	memcpy(Chains[i].path, Chains[i].update[ins].upath, 4*MAX_PATH_LENGTH);
-//	cout<<"cost变化："<<Chains[i].fT<<" "<<Chains[i].update[ins].uT<<endl;
+	cout<<"singlecost变化："<<Chains[i].fT<<" "<<Chains[i].update[ins].uT<<endl;
 	Chains[i].fT = Chains[i].update[ins].uT;
 	Chains[i].ins = ins;
 	Chains[i].phy = Chains[i].update[ins].uphy;
@@ -254,7 +290,7 @@ void action() {
 //			cout<<"done！"<<endl;
 //			cout<<"清空路径..."<<endl;
 			memset(Input_Chains[i].update[ins].upath, 0, MAX_PATH_LENGTH*4);
-			cout<<"done！"<<endl; 
+//			cout<<"done！"<<endl; 
 
 			if(Input_Chains[i].update[ins].succ != false) {
 //				cout<<"选取路径..."<<endl;
@@ -349,19 +385,19 @@ void action() {
 		}
 	}
 	if(update_chain >= NUM_OF_INPUT_CHAINS) {
-//		cout<<"更新 A  "<<update_chain - NUM_OF_INPUT_CHAINS<<" "<<update_ins<<endl;
+		cout<<"更新 A  "<<update_chain - NUM_OF_INPUT_CHAINS<<" "<<update_ins<<endl;
 //		cout<<Allocated_Chains[update_chain - NUM_OF_INPUT_CHAINS].node<<" "<<Allocated_Chains[update_chain - NUM_OF_INPUT_CHAINS].update[update_ins].unode<<endl;
 		update(update_chain - NUM_OF_INPUT_CHAINS, Allocated_Chains, update_ins, update_cost);
 //		cout<<"done！"<<endl;
 	}
 	else if(update_chain >= 0){
-//		cout<<"更新 I  "<<update_chain<<" "<<update_ins<<endl;
+		cout<<"更新 I  "<<update_chain<<" "<<update_ins<<endl;
 //		cout<<Input_Chains[update_chain].node<<" "<<Input_Chains[update_chain].update[update_ins].unode<<endl;
 		update(update_chain, Input_Chains, update_ins, update_cost);
 //		cout<<"done！"<<endl;
 	}
 	else {
-//		cout<<"没有更新"<<T<<endl;
+		cout<<"没有更新"<<T<<endl;
 		return;
 	}
 }
@@ -377,26 +413,26 @@ int main() {
     start = GetTickCount(); 
     
 	// 将所有新服务链的先选一种初始配置 
-//	init();
-////	cout<<"init over"<<endl;
-////	printChoice();
-//
-//	totalCost();
-//	cout<<T<<endl;
-//	// 选择参与此次调整的已分配服务链 
-//	classify();
-//	
+	init();
+//	cout<<"init over"<<endl;
+//	printChoice();
+
+	totalCost();
+	cout<<T<<endl;
+	// 选择参与此次调整的已分配服务链 
+	classify();
+	
 	// 策略更新 
-//	for(int times = 0; times < 5; ++times) {
-////		cout<<"第"<<times<<"次："<<endl;
-//		action();
-////		cout<<endl;
-//	}
+	for(int times = 0; times < 30; ++times) {
+//		cout<<"第"<<times<<"次："<<endl;
+		action();
+//		cout<<endl;
+	}
 	
 	stop = GetTickCount();  
     printf("\n运行时间: %lld ms\n", stop - start);
     
-//	printChoice();
+	printChoice();
 //	printBW();
 //	printRS();
 

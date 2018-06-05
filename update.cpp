@@ -63,14 +63,14 @@ bool checkCapacity(struct CFC Chains[], int i, int ins) {
 	
 	if(node > 0) {
 		if(node != 41) {
-			node_vnf_demand[node - 41][phy] -= demand;
+			node_vnf_demand[node - 42][phy] -= demand;
 		}
 		else CAP += demand;
 	}
 	
 	if(unode != 41) {
-		if((RS[unode - 41][0] >= node_resource[unode - 41][0] && RS[unode - 41][1] >= node_resource[unode - 41][1]) ||
-(int)((node_vnf_demand[unode - 41][uphy] + demand + unit_rps[uphy] - 1)/unit_rps[uphy]) == node_vnf_count[unode - 41][uphy]) {
+		if((RS[unode - 42][0] >= node_resource[unode - 42][0] && RS[unode - 42][1] >= node_resource[unode - 42][1]) ||
+(int)((node_vnf_demand[unode - 42][uphy] + demand + unit_rps[uphy] - 1)/unit_rps[uphy]) == node_vnf_count[unode - 42][uphy]) {
 		  	flag = true;
 		}	
 	}
@@ -80,7 +80,7 @@ bool checkCapacity(struct CFC Chains[], int i, int ins) {
 	
 	if(node > 0) {
 		if(node != 41) {
-			node_vnf_demand[node - 41][phy] -= demand;
+			node_vnf_demand[node - 42][phy] += demand;
 		}
 	}
 	else CAP -= demand;
@@ -96,31 +96,50 @@ void updateCapacity(struct CFC Chains[], int i, int ins) {
 	
 	if(node > 0) {
 		if(node != 41) {
-			node_vnf_demand[node - 41][phy] -= demand;
-			tmp = node_vnf_count[node - 41][phy];
-			node_vnf_count[node - 41][phy] = (int)((node_vnf_demand[node - 41][phy] - demand + unit_rps[phy] - 1)/unit_rps[phy]);
-			tmp -= node_vnf_count[node - 41][phy];
+			node_used[node - 41] -= 1;
+			node_vnf_demand[node - 42][phy] -= demand;
+			tmp = node_vnf_count[node - 42][phy];
+			node_vnf_count[node - 42][phy] = (int)((node_vnf_demand[node - 42][phy] + unit_rps[phy] - 1)/unit_rps[phy]);
+			tmp -= node_vnf_count[node - 42][phy];
 			if(tmp != 0) {
 				for(int j = 0; j < 2; ++j) {
-					RS[node - 41][j] += node_resource[phy][j] * tmp;
+					RS[node - 42][j] += node_resource[phy][j] * tmp;
 				}
 			}
 		}
 		else CAP += demand;
 	}
 	
-	if(unode > 0) {
-		if(unode != 41) {
-			node_vnf_demand[unode - 41][uphy] += demand;
-			tmp = node_vnf_count[unode - 41][uphy];
-			node_vnf_count[unode - 41][uphy] = (int)((node_vnf_demand[unode - 41][uphy] + demand + unit_rps[uphy] - 1)/unit_rps[uphy]);
-			tmp = node_vnf_count[unode - 41][uphy] - tmp;
+	if(unode > 0) {    // 更改后的服务链有用到功能节点 
+		if(unode != 41) {    // 功能节点是云节点 
+			node_used[unode - 41] += 1;
+//			cout << "该节点上该 NF 的 demand 变化：" << node_vnf_demand[unode - 42][uphy] << " ";
+			node_vnf_demand[unode - 42][uphy] += demand;
+//			cout << node_vnf_demand[unode - 42][uphy] << endl;
+			tmp = node_vnf_count[unode - 42][uphy];
+			node_vnf_count[unode - 42][uphy] = (int)((node_vnf_demand[unode - 42][uphy] + unit_rps[uphy] - 1)/unit_rps[uphy]);
+
+			tmp = node_vnf_count[unode - 42][uphy] - tmp;
+
 			if(tmp != 0) {
 				for(int j = 0; j < 2; ++j) {
-					RS[unode - 41][j] -= node_resource[uphy][j] * tmp;
+					RS[unode - 42][j] -= node_resource[uphy][j] * tmp;
 				}
 			}
+
 		}
-		else CAP -= demand;
+		else CAP -= demand;    // 功能节点是物理节点
 	}
+
+//	cout << "node_used：" << endl;
+//	for(int i = 0; i < NUM_OF_NFNODES; ++i) {
+//		cout << node_used[i] << " ";
+//	}
+//	cout << endl << "node_vnf_count：" << endl;
+//	for(int i = 0; i < NUM_OF_CLOUDS; ++i) {
+//		for(int j = 0; j < 3; ++j) {
+//			cout << node_vnf_count[i][j] << " ";
+//		}
+//	}
+//	cout << endl;
 }
