@@ -4,7 +4,6 @@
 #include <windows.h> 
 #include "alg.h"
 #include "read_chains.cpp" 
-#include "print.cpp"
 
 using namespace std;
 
@@ -45,10 +44,6 @@ void chooseNode(int i, bool *nf_done, struct CFC Chains[], int type, int ins) {
 void choosePath(int i, bool *nf_done, struct CFC Chains[], int ins) {
 	
 //	cout<<*nf_done<<" "<<Chains[i].update[ins].unode<<endl; 
-//	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
-//		cout<<Chains[i].update[ins].upath[step]<<" ";
-//	}
-//	cout<<endl;
 
 	int step = 0; 
 	int src_sw = (Chains[i].src-1)/3 + 28;
@@ -186,7 +181,8 @@ void init() {
 			if(Input_Chains[i].update[ins].succ != false) {
 				// 挑选路径
 				choosePath(i, &nf_done, Input_Chains, ins);   // 失败后恢复
-				
+			}	
+			if(Input_Chains[i].update[ins].succ != false) {
 				// 扣除资源和带宽 
 				updateTraffic(Input_Chains[i].path, Input_Chains[i].update[ins].upath, Input_Chains[i].demand, Input_Chains[i].phy, Input_Chains[i].update[ins].uphy);
 				updateCapacity(Input_Chains, i, ins);
@@ -195,10 +191,15 @@ void init() {
 				Input_Chains[i].ins = ins;
 				Input_Chains[i].phy = Input_Chains[i].update[ins].uphy;
 				Input_Chains[i].node = Input_Chains[i].update[ins].unode;
-			}	
+				
+			}
 		}
- 
-		Input_Chains[i].fT = singleCost(i, Input_Chains, ins);
+ 		if(Input_Chains[i].update[ins].succ != false) {
+			Input_Chains[i].fT = singleCost(i, Input_Chains, ins);	
+		}
+		else {
+			Input_Chains[i].fT = singleCost(i, Input_Chains, 0);
+		}
 	}
 } 
 
@@ -230,46 +231,27 @@ void classify() {
 }
 
 void update(int i, struct CFC Chains[], int ins, float update_cost) {
-	cout << "node_used：" << endl;
-	for(int i = 0; i < NUM_OF_NFNODES; ++i) {
-		cout << node_used[i] << " ";
-	}
-	cout << endl << "node_vnf_count：" << endl;
-	for(int i = 0; i < NUM_OF_CLOUDS; ++i) {
-		for(int j = 0; j < 3; ++j) {
-			cout << node_vnf_count[i][j] << " ";
-		}
-	}
-	cout << endl << "路径变化：" << endl;
-	
-	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
-		cout<<Chains[i].path[step]<<" ";
-	}
-	cout << endl;
-	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
-		cout<<Chains[i].update[ins].upath[step]<<" ";
-	}
-	cout << endl;
-	
-	cout << "节点选择变化：" << Chains[i].node << " " << Chains[i].update[ins].unode << endl;
+//	printUsage();
+//	cout << "路径变化：" << endl;
+//	
+//	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
+//		cout<<Chains[i].path[step]<<" ";
+//	}
+//	cout << endl;
+//	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
+//		cout<<Chains[i].update[ins].upath[step]<<" ";
+//	}
+//	cout << endl;
+//	
+//	cout << "节点选择变化：" << Chains[i].node << " " << Chains[i].update[ins].unode << endl;
 	updateTraffic(Chains[i].path, Chains[i].update[ins].upath, Chains[i].demand, Chains[i].phy, Chains[i].update[ins].uphy);
-	updateCapacity(Input_Chains, i, ins);
+	updateCapacity(Chains, i, ins);
 	
-	cout << "node_used：" << endl;
-	for(int i = 0; i < NUM_OF_NFNODES; ++i) {
-		cout << node_used[i] << " ";
-	}
-	cout << endl << "node_vnf_count：" << endl;
-	for(int i = 0; i < NUM_OF_CLOUDS; ++i) {
-		for(int j = 0; j < 3; ++j) {
-			cout << node_vnf_count[i][j] << " ";
-		}
-	}
-	cout << endl;
+//	printUsage();
 //	cout<<"更新："<<i<<endl;
 	Chains[i].node = Chains[i].update[ins].unode;
 	memcpy(Chains[i].path, Chains[i].update[ins].upath, 4*MAX_PATH_LENGTH);
-	cout<<"singlecost变化："<<Chains[i].fT<<" "<<Chains[i].update[ins].uT<<endl;
+//	cout<<"singlecost变化："<<Chains[i].fT<<" "<<Chains[i].update[ins].uT<<endl;
 	Chains[i].fT = Chains[i].update[ins].uT;
 	Chains[i].ins = ins;
 	Chains[i].phy = Chains[i].update[ins].uphy;
@@ -277,6 +259,7 @@ void update(int i, struct CFC Chains[], int ins, float update_cost) {
 	// update T
 	T = update_cost;
 	cout<<T<<endl;
+//	printCost();
 }
 
 void action() { 
@@ -296,10 +279,12 @@ void action() {
 //				cout<<"选取路径..."<<endl;
 				choosePath(i, &nf_done, Input_Chains, ins);
 //			    cout<<"done！"<<endl;
+//				cout<<"新输入服务链"<<i<<"新cost："<<endl;
+				
 			}
-
-//			cout<<"新输入服务链"<<i<<"新cost："<<endl;
-			Input_Chains[i].update[ins].uT = singleCost(i, Input_Chains, ins);
+			if(Input_Chains[i].update[ins].succ != false) {
+				Input_Chains[i].update[ins].uT = singleCost(i, Input_Chains, ins);
+			}
 		}
 	}
 	
@@ -322,13 +307,16 @@ void action() {
 //				cout<<"选取路径..."<<endl;
 				choosePath(c, &nf_done, Allocated_Chains, ins);
 //			    cout<<"done！"<<endl;
+//				cout<<"新输入服务链"<<c<<"新cost："<<endl;
+				
+			}
+			if(Allocated_Chains[c].update[ins].succ != false) {
+				Allocated_Chains[c].update[ins].uT = singleCost(c, Allocated_Chains, ins);
 			}
 
-//			cout<<"新输入服务链"<<c<<"新cost："<<endl;
-			Allocated_Chains[c].update[ins].uT = singleCost(c, Allocated_Chains, ins);
 		}	
 	}
-	
+
 //	double max_perform = -100.0;
 //	double max_perform = 0.0;
 	double min_perform = 1000.0, Qf; 
@@ -340,6 +328,7 @@ void action() {
 		int type = Input_Chains[i].service_type;
 		for(int ins = 0; ins < num_of_ins[type]; ++ins) {
 			if(Input_Chains[i].update[ins].succ == false) {
+//				cout << i << "不参与更新" << endl;
 				continue;
 			}
 //			cout<<newCost(Input_Chains, i, ins)<<" + "<<Input_Chains[i].update[ins].uT<<" - "<<Input_Chains[i].fT<<endl;
@@ -366,6 +355,7 @@ void action() {
 		
 		for(int ins = 0; ins < num_of_ins[type]; ++ins) {
 			if(Allocated_Chains[c].update[ins].succ == false) {
+//				cout << c << " 不参与更新" << endl;
 				continue;
 			}
 //			cout<<newCost(Input_Chains, c, ins)<<" + "<<Allocated_Chains[c].update[ins].uT<<" - "<<Allocated_Chains[c].fT<<endl;
@@ -384,6 +374,10 @@ void action() {
 			}
 		}
 	}
+	
+//	cout << "未更新前的 T ——" << T << endl;
+//	printUsage();
+//	cout << endl;
 	if(update_chain >= NUM_OF_INPUT_CHAINS) {
 		cout<<"更新 A  "<<update_chain - NUM_OF_INPUT_CHAINS<<" "<<update_ins<<endl;
 //		cout<<Allocated_Chains[update_chain - NUM_OF_INPUT_CHAINS].node<<" "<<Allocated_Chains[update_chain - NUM_OF_INPUT_CHAINS].update[update_ins].unode<<endl;
@@ -404,35 +398,49 @@ void action() {
 
 int main() {
 	srand((unsigned)time(NULL));    // 随机种子调用一次即可
-//	printBW();
-
+	
+	cout << "before read" << endl;
 	read();
-//	cout<<"read over"<<endl;
+	cout << "read over" << endl;
+	printRS();
+//	printBW();
+//	printUsage();
 	DWORD start, stop;  
-//    unsigned int t = 0;  
     start = GetTickCount(); 
     
+//    printRS();
 	// 将所有新服务链的先选一种初始配置 
 	init();
-//	cout<<"init over"<<endl;
+//	cout << "init over" << endl;
+
+//	printRS();
 //	printChoice();
+//	printUsage();
 
 	totalCost();
-	cout<<T<<endl;
+	cout << T << endl;
+//	cout << "cost is caculated" << endl;
+//	printRS();
+
+//	printBW();
 	// 选择参与此次调整的已分配服务链 
-	classify();
-	
-	// 策略更新 
-	for(int times = 0; times < 30; ++times) {
+//	classify();
+//	
+//	// 策略更新 
+//	for(int times = 0; times < 300; ++times) {
 //		cout<<"第"<<times<<"次："<<endl;
-		action();
-//		cout<<endl;
-	}
+////		printRS();
+//		
+//		action();
+////		printUsage();
+////		cout<<endl;
+//	}
 	
 	stop = GetTickCount();  
     printf("\n运行时间: %lld ms\n", stop - start);
-    
-	printChoice();
+
+//	printChoice();
+//	printUsage();
 //	printBW();
 //	printRS();
 

@@ -1,7 +1,7 @@
 using namespace std;
 
 #define NUM_OF_CHAIN_TYPES 5
-#define NUM_OF_INPUT_CHAINS 41
+#define NUM_OF_INPUT_CHAINS 10
 #define NUM_OF_FEATURES 6
 #define NUM_OF_NODES 45
 #define NUM_OF_NFNODES 5
@@ -211,19 +211,6 @@ int RT4_RT3[5][4] = {
 int RT_Paths[NUM_OF_ROUTER][NUM_OF_ROUTER][5][4];
 
 int node_used[NUM_OF_NFNODES] = {0};
-float CR = 0.0;
-float CI = 0.0;
-//float CU = 0.0;
-//float CFF = 0.0;
-float node_using_cost[NUM_OF_NFNODES] = {0, 0.2, 0.2, 0.2, 0.1};
-float node_init_cost = 0.4;
-float unit_rps[NUM_OF_NF] = {1000.0, 300.0, 100.0};
-
-float node_resource[NUM_OF_NF][2] = {
-	{1, 100},
-	{1, 200},
-	{1, 500}
-};
 
 float node_vnf_demand[NUM_OF_CLOUDS][3]; 
 int node_vnf_count[NUM_OF_CLOUDS][3];
@@ -317,12 +304,22 @@ float BW[NUM_OF_NODES][NUM_OF_NODES] = {
 };
 
 float RS[NUM_OF_CLOUDS][2] = {
-	{20, 3000},
-	{20, 3000},
-	{20, 3000},
-	{80, 20000}
+	{20.0, 3000.0},
+	{20.0, 3000.0},
+	{20.0, 3000.0},
+	{80.0, 20000.0}
 };
+//float CU = 0.0;
+//float CFF = 0.0;
+float node_using_cost[NUM_OF_NFNODES] = {0, 0.2, 0.2, 0.2, 0.1};
+float node_init_cost = 0.4;
+float unit_rps[NUM_OF_NF] = {1000.0, 300.0, 100.0};
 
+float node_resource[NUM_OF_NF][2] = {
+	{1.0, 100.0},
+	{1.0, 200.0},
+	{1.0, 500.0}
+};
 float CAP = 20000;
 
 //float resource_cost_of_node[NUM_OF_NFNODES] = {1, 2, 2, 2, 3};    // 这里需要改
@@ -333,7 +330,7 @@ float prop[NUM_OF_NF] = {0.9, 0.8, 0.7};
 
 int from[NUM_OF_PATH] = {0}, to[NUM_OF_PATH] = {0};
 
-float multiplier = 5;
+float multiplier = 1.0;
 
 
 

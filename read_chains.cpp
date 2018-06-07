@@ -32,10 +32,13 @@ int composite(int path[], bool p_choice[][5][NUM_OF_PATH], int src, int sink) {
 //		for(it = link.begin(); it != link.end(); it++) {
 //			cout<<it->first<<" "<<it->second<<endl;
 //		}
+//		cout << endl;
 		while(!link.empty()) {
+//			cout << "非空" << endl;
 			for(it = link.begin(); it->first != path[k]; it++) {} 
 			++k;
 			path[k] = it->second;
+//			cout << path[k] << " ";
 			if(path[k] >= 41) {
 				node = path[k];
 				node_used[node - 41] += 1;
@@ -53,7 +56,7 @@ int composite(int path[], bool p_choice[][5][NUM_OF_PATH], int src, int sink) {
 		}
 	}
 //	for(k = 0; k < MAX_PATH_LENGTH; ++k) {
-//		cout<<path[k]<<" ";
+//		cout << path[k] << " ";
 //	} 
 //	cout<<endl;
 	return node;
@@ -67,7 +70,8 @@ void allocated_chains() {
 	
 	// 读取原先服务链的 src sink type demand
 //	cout<<"读取原先服务链的 src sink type demand 开始"<<endl;
-	infile.open("former_cfc.txt");
+	infile.open("result\\20180606 15A 10I\\prepare\\former_cfc.txt");    // 需要用双反斜杠, 或一个正斜杠 
+//	cout<<"读取成功"<<endl;
 	while(getline(infile, s)) {  
     	bool temp = false;
     	int pos = 0, data = 0;
@@ -100,7 +104,8 @@ void allocated_chains() {
 
 	// 读取 feature 选择 
 	//	cout<<"读取 feature 选择开始"<<endl; 
-	infile.open("f_choice.txt");
+	infile.open("result\\20180606 15A 10I\\prepare\\f_choice.txt");
+//	cout<<"读取成功"<<endl;
 	c = 0;
 	
 	while(getline(infile, s)) {
@@ -119,7 +124,8 @@ void allocated_chains() {
 //		cout<<f_choice[0]<<" "<<f_choice[1]<<" "<<f_choice[2]<<" "<<f_choice[3]<<" "<<f_choice[4]<<" "<<f_choice[5]<<endl;
 
 		// 推断出 ins
-		for(int num = 0; num < num_of_ins[Allocated_Chains[c].service_type]; ++num) {
+		int num = 0;
+		for(; num < num_of_ins[Allocated_Chains[c].service_type]; ++num) {
 			if(cmp(f_choice, chain_types[Allocated_Chains[c].service_type][num])) {
 				Allocated_Chains[c].ins = num;
 //				cout<<"ins："<<num<<endl;
@@ -130,7 +136,7 @@ void allocated_chains() {
 		int phy = 0;
 		for(int f : phy_feature_set) {
 			if(f_choice[f] == true) {
-				Allocated_Chains[c].update[Allocated_Chains[c].ins].uphy = Allocated_Chains[c].phy = phy;
+				Allocated_Chains[c].update[num].uphy = phy;
 //				cout<<"phy："<<phy<<endl;
 			}
 			phy++;
@@ -142,7 +148,7 @@ void allocated_chains() {
 //	cout<<"读取 feature 选择成功"<<endl; 
 
 	
-	infile.open("raw.txt"); 
+	infile.open("result\\20180606 15A 10I\\prepare\\raw.txt"); 
 	
 	// 读取路径段 
 //	cout<<"读取路径段开始"<<endl; 
@@ -210,22 +216,26 @@ void allocated_chains() {
 		// 合成路径 
 //		cout<<"合成路径"<<c<<"开始"<<endl;
 		Allocated_Chains[c].update[Allocated_Chains[c].ins].unode = composite(Allocated_Chains[c].update[Allocated_Chains[c].ins].upath, p_choice, Allocated_Chains[c].src, Allocated_Chains[c].sink);
+//		cout << "---" << endl;
+		updateCapacity(Allocated_Chains, c, Allocated_Chains[c].ins);    // 必须在下一句之前 
+		Allocated_Chains[c].node = Allocated_Chains[c].update[Allocated_Chains[c].ins].unode;
+		
 //		cout<<"合成路径"<<c<<"成功"<<endl;
 		
-		
+//		cout << "------" << endl;
 		// 更新资源和链链路 
 //	    cout<<"A 初始 - "<<c<<endl; 
-		updateTraffic(Allocated_Chains[c].path, Allocated_Chains[c].update[Allocated_Chains[c].ins].upath, Allocated_Chains[c].demand, -1, Allocated_Chains[c].phy);
-	    updateCapacity(Allocated_Chains, c, Allocated_Chains[c].ins);
+		updateTraffic(Allocated_Chains[c].path, Allocated_Chains[c].update[Allocated_Chains[c].ins].upath, Allocated_Chains[c].demand, -1, Allocated_Chains[c].update[Allocated_Chains[c].ins].uphy);
+	    Allocated_Chains[c].phy = Allocated_Chains[c].update[Allocated_Chains[c].ins].uphy; 
 		memcpy(Allocated_Chains[c].path, Allocated_Chains[c].update[Allocated_Chains[c].ins].upath, 4 * MAX_PATH_LENGTH);
 	    memcpy(Allocated_Chains[c].ini_path, Allocated_Chains[c].path, 4 * MAX_PATH_LENGTH);
+//	    cout << "---------" << endl;
 	    
-	    Allocated_Chains[c].node = Allocated_Chains[c].update[Allocated_Chains[c].ins].unode;
 		Allocated_Chains[c].fT = Allocated_Chains[c].update[Allocated_Chains[c].ins].uT = singleCost(c, Allocated_Chains, Allocated_Chains[c].ins);    // 把这里换一个评估函数 
-
+//		cout << "------------" << endl;
 		c++;
 	}
-//	cout<<"存储路径选择成功"<<endl;
+	cout<<"存储路径选择成功"<<endl;
 	infile.close();
 
 } 
@@ -234,7 +244,7 @@ void input_chains() {    // 输入服务链参数(源、目、类型)
 
 	string s;
 	ifstream infile; 
-    infile.open("input_chains.txt"); 
+    infile.open("result\\20180606 15A 10I\\prepare\\input_chains.txt"); 
 	int c = 0; 
     while(getline(infile, s)) {  
     	bool temp = false;
@@ -300,4 +310,12 @@ void read() {
 //	allocated_paths();
 	
 	input_chains();
+	
+	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
+		Input_Chains[i].demand *= multiplier;
+	}
+
+	for(int c = 0; c < NUM_OF_ALLOCATED_CHAINS; ++c) {
+		Allocated_Chains[c].demand *= multiplier;
+	}
 }

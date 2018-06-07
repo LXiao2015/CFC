@@ -44,6 +44,7 @@ float singleCost(int i, struct CFC Chains[], int ins) {
 }
 
 void totalCost() {
+	float CR = 0.0, CI = 0.0;
 	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
 		T += Input_Chains[i].fT;
 //		cout<<T<<endl;
@@ -53,26 +54,12 @@ void totalCost() {
 		T += Allocated_Chains[c].fT;
 //		cout<<T<<endl;
 	}
-	cout << T << " ";
+
 	for(int i = 0; i < NUM_OF_NFNODES; ++i) {
 		CR += (node_used[i] > 0? 1: 0) * node_using_cost[i];
 	}
 	T += CR;
 	
-	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
-		int i_node = Input_Chains[i].node, i_phy = Input_Chains[i].phy;
-		if(i_node != 41) {
-			node_vnf_demand[i_node - 42][i_phy] += Input_Chains[i].demand;
-//			node_vnf_count[i_node - 42][i_phy] = (int)(node_vnf_demand[i_node - 42][i_phy] / unit_rps[i_phy]);
-		}
-	}
-	for(int c = 0; c < NUM_OF_ALLOCATED_CHAINS; ++c) {
-		int a_node = Allocated_Chains[c].node, a_phy = Allocated_Chains[c].phy;
-		if(a_node != 41) {
-			node_vnf_demand[a_node - 42][a_phy] += Allocated_Chains[c].demand;
-//			node_vnf_count[a_node - 42][a_phy] = (int)(node_vnf_demand[a_node - 42][a_phy] / unit_rps[a_phy]);
-		}
-	}
 	for(int i = 0; i < NUM_OF_CLOUDS; ++i) {
 		for(int j = 0; j < 3; ++j) {
 			CI += node_vnf_count[i][j] * node_init_cost;
@@ -80,17 +67,7 @@ void totalCost() {
 	}
 	T += CI;
 	
-//	cout<<"node_used£º"<<endl;
-//	for(int i = 0; i < NUM_OF_NFNODES; ++i) {
-//		cout<<node_used[i]<<" ";
-//	}
-//	cout<<endl<<"node_vnf_count£º"<<endl;
-//	for(int i = 0; i < NUM_OF_CLOUDS; ++i) {
-//		for(int j = 0; j < 3; ++j) {
-//			cout<<node_vnf_count[i][j]<<" ";
-//		}
-//	}
-//	cout << endl << CR << " " << CI << endl;
+//	printUsage();
 }
 
 float newCost(struct CFC Chains[], int i, int ins) {
