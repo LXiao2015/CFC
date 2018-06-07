@@ -77,7 +77,7 @@ struct Update {
 	int unode = 0;
 	int upath[MAX_PATH_LENGTH] = {0};
 	bool succ = false;
-	float uT;
+	double uT;
 };
 
 struct CFC {
@@ -88,7 +88,7 @@ struct CFC {
 	int phy = -1;    // 第几个物理特征 
 	int node = 0;
 //	int ini_node = 0;
-	float demand;    // 暂时固定
+	double demand;    // 暂时固定
 	int ini_path[MAX_PATH_LENGTH] = {0};
 	int path[MAX_PATH_LENGTH] = {0};    // 最长会有 14 个点
 	
@@ -97,7 +97,7 @@ struct CFC {
 //	int update_phy = -1;
 //	int update_node = 0;
 //	int update_path[MAX_PATH_LENGTH] = {0};
-	float fT;
+	double fT;
 } Input_Chains[NUM_OF_INPUT_CHAINS], Allocated_Chains[NUM_OF_ALLOCATED_CHAINS]; 
 
 int realc[NUM_OF_ALLOCATED_CHAINS] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
@@ -212,7 +212,7 @@ int RT_Paths[NUM_OF_ROUTER][NUM_OF_ROUTER][5][4];
 
 int node_used[NUM_OF_NFNODES] = {0};
 
-float node_vnf_demand[NUM_OF_CLOUDS][3]; 
+double node_vnf_demand[NUM_OF_CLOUDS][3]; 
 int node_vnf_count[NUM_OF_CLOUDS][3];
 
 //int chain_failure_cost[NUM_OF_CHAIN_TYPES] = {1, 2, 4, 8, 16};
@@ -225,18 +225,18 @@ int feature_failure_cost[NUM_OF_CHAIN_TYPES][NUM_OF_FEATURES] = {
 	{64, 0, 0, 0, 0, 64}
 };
 
-float update_msg_cost = 0.2;
+double update_msg_cost = 0.2;
 
 int num_of_realc = 0;
 
 // 拓扑带宽
-float h_s = 8000.0;
-float s_r = 8000.0;
-float s_e = 8000.0;
-float r_r = 8000.0;
-float n_r = 16000.0;
+double h_s = 8000.0;
+double s_r = 8000.0;
+double s_e = 8000.0;
+double r_r = 8000.0;
+double n_r = 16000.0;
 
-float BW[NUM_OF_NODES][NUM_OF_NODES] = {
+double BW[NUM_OF_NODES][NUM_OF_NODES] = {
 	/*
 	 1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45
 	*/
@@ -303,34 +303,33 @@ float BW[NUM_OF_NODES][NUM_OF_NODES] = {
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, n_r, 0, 0, 0, 0, 0}
 };
 
-float RS[NUM_OF_CLOUDS][2] = {
+double RS[NUM_OF_CLOUDS][2] = {
 	{20.0, 3000.0},
 	{20.0, 3000.0},
 	{20.0, 3000.0},
 	{80.0, 20000.0}
 };
-//float CU = 0.0;
-//float CFF = 0.0;
-float node_using_cost[NUM_OF_NFNODES] = {0, 0.2, 0.2, 0.2, 0.1};
-float node_init_cost = 0.4;
-float unit_rps[NUM_OF_NF] = {1000.0, 300.0, 100.0};
 
-float node_resource[NUM_OF_NF][2] = {
+double node_using_cost[NUM_OF_NFNODES] = {0, 0.2, 0.2, 0.2, 0.1};
+double node_init_cost = 0.4;
+double unit_rps[NUM_OF_NF] = {1000.0, 300.0, 100.0};
+
+double node_resource[NUM_OF_NF][2] = {
 	{1.0, 100.0},
 	{1.0, 200.0},
 	{1.0, 500.0}
 };
-float CAP = 20000;
+double CAP = 20000;
 
 //float resource_cost_of_node[NUM_OF_NFNODES] = {1, 2, 2, 2, 3};    // 这里需要改
 
-float T = 0.0;
+double T = 0.0;
 
-float prop[NUM_OF_NF] = {0.9, 0.8, 0.7}; 
+double prop[NUM_OF_NF] = {0.9, 0.8, 0.7}; 
 
 int from[NUM_OF_PATH] = {0}, to[NUM_OF_PATH] = {0};
 
-float multiplier = 1.0;
+double multiplier = 1.0;
 
 
 

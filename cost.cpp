@@ -7,7 +7,7 @@ int getLength(int seq[], int maxLen) {
 }
 
 float singleCost(int i, struct CFC Chains[], int ins) { 
-	float cff = 0.0, cu = 0.0;
+	double cff = 0.0, cu = 0.0;
 //	CF = chain_failure_cost[Input_Chains[i].service_type];
 	for(int j = 0; j < NUM_OF_FEATURES; ++j) {
 //		cout<<chain_types[Chains[i].service_type][ins][j]<<" ";
@@ -34,6 +34,7 @@ float singleCost(int i, struct CFC Chains[], int ins) {
 		}
 		s--;
 	} 
+	count--;    // 汇聚节点不需要更新 
 //	cout<<"需要发送更新消息的点："<<count<<endl;
 	cu = count * update_msg_cost;
 	
@@ -44,7 +45,7 @@ float singleCost(int i, struct CFC Chains[], int ins) {
 }
 
 void totalCost() {
-	float CR = 0.0, CI = 0.0;
+	double CR = 0.0, CI = 0.0;
 	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
 		T += Input_Chains[i].fT;
 //		cout<<T<<endl;
@@ -77,8 +78,8 @@ float newCost(struct CFC Chains[], int i, int ins) {
 		return T;
 	}
 	
-	float newT = T;
-	float demand = Chains[i].demand;
+	double newT = T;
+	double demand = Chains[i].demand;
 //	cout << "here " << newT << endl;
 	// node using cost
 	if(unode != node) {

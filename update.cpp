@@ -1,8 +1,8 @@
 #include "print.cpp"
 
-bool checkTraffic(int path[], int upath[], float demand, int phy, int uphy) {    // 已改成双向
+bool checkTraffic(int path[], int upath[], double demand, int phy, int uphy) {    // 已改成双向
 	bool flag = true;
-	float dmd = demand; 
+	double dmd = demand; 
 	
 	for(int step = 1; path[step] > 0; ++step) {
 		if(path[step-1] >= 41) {
@@ -37,8 +37,8 @@ bool checkTraffic(int path[], int upath[], float demand, int phy, int uphy) {   
 	return flag;
 }
 
-void updateTraffic(int path[], int upath[], float demand, int phy, int uphy) {
-	float dmd = demand; 
+void updateTraffic(int path[], int upath[], double demand, int phy, int uphy) {
+	double dmd = demand; 
 //	for(int step = 1; path[step] > 0; ++step) {
 //		cout << path[step-1] << " ";
 //	}
@@ -71,7 +71,7 @@ bool checkCapacity(struct CFC Chains[], int i, int ins) {
 	bool flag = false;
 	int node = Chains[i].node, unode = Chains[i].update[ins].unode;
 	int phy = Chains[i].phy, uphy = Chains[i].update[ins].uphy;
-	float demand = Chains[i].demand;
+	double demand = Chains[i].demand;
 	
 	if(node > 0) {
 		if(node != 41) {
@@ -104,15 +104,17 @@ void updateCapacity(struct CFC Chains[], int i, int ins) {
 	int tmp;
 	int node = Chains[i].node, unode = Chains[i].update[ins].unode;
 	int phy = Chains[i].phy, uphy = Chains[i].update[ins].uphy;
+//	cout << node << " "<< unode << " "<< uphy << " "<< phy << endl;
 	
 	if(node == unode && uphy == phy) {
 //		cout << "服务节点和物理特征没变，不需要更新" << endl; 
 		return ;
 	}
 	
-	float demand = Chains[i].demand;
+	double demand = Chains[i].demand;
 	
 	if(node > 0) {
+//		cout << "有 node" << endl;
 		node_used[node - 41] -= 1;
 		if(node != 41) {	
 			node_vnf_demand[node - 42][phy] -= demand;
@@ -130,6 +132,7 @@ void updateCapacity(struct CFC Chains[], int i, int ins) {
 	}
 	
 	if(unode > 0) {    // 更改后的服务链有用到功能节点 
+//		cout << "有 unode" << endl;
 		node_used[unode - 41] += 1;
 		if(unode != 41) {    // 功能节点是云节点 
 //			cout << "该节点上该 NF 的 demand 变化：" << node_vnf_demand[unode - 42][uphy] << " ";

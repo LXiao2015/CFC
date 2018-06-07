@@ -41,7 +41,7 @@ int composite(int path[], bool p_choice[][5][NUM_OF_PATH], int src, int sink) {
 //			cout << path[k] << " ";
 			if(path[k] >= 41) {
 				node = path[k];
-				node_used[node - 41] += 1;
+//				node_used[node - 41] += 1;
 			}
 			link.erase(it);
 		}	

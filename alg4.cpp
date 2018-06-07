@@ -308,7 +308,6 @@ void action() {
 				choosePath(c, &nf_done, Allocated_Chains, ins);
 //			    cout<<"done！"<<endl;
 //				cout<<"新输入服务链"<<c<<"新cost："<<endl;
-				
 			}
 			if(Allocated_Chains[c].update[ins].succ != false) {
 				Allocated_Chains[c].update[ins].uT = singleCost(c, Allocated_Chains, ins);
@@ -379,19 +378,19 @@ void action() {
 //	printUsage();
 //	cout << endl;
 	if(update_chain >= NUM_OF_INPUT_CHAINS) {
-		cout<<"更新 A  "<<update_chain - NUM_OF_INPUT_CHAINS<<" "<<update_ins<<endl;
+//		cout<<"更新 A  "<<update_chain - NUM_OF_INPUT_CHAINS<<" "<<update_ins<<endl;
 //		cout<<Allocated_Chains[update_chain - NUM_OF_INPUT_CHAINS].node<<" "<<Allocated_Chains[update_chain - NUM_OF_INPUT_CHAINS].update[update_ins].unode<<endl;
 		update(update_chain - NUM_OF_INPUT_CHAINS, Allocated_Chains, update_ins, update_cost);
 //		cout<<"done！"<<endl;
 	}
 	else if(update_chain >= 0){
-		cout<<"更新 I  "<<update_chain<<" "<<update_ins<<endl;
+//		cout<<"更新 I  "<<update_chain<<" "<<update_ins<<endl;
 //		cout<<Input_Chains[update_chain].node<<" "<<Input_Chains[update_chain].update[update_ins].unode<<endl;
 		update(update_chain, Input_Chains, update_ins, update_cost);
 //		cout<<"done！"<<endl;
 	}
 	else {
-		cout<<"没有更新"<<T<<endl;
+//		cout<<"没有更新"<<T<<endl;
 		return;
 	}
 }
@@ -399,9 +398,9 @@ void action() {
 int main() {
 	srand((unsigned)time(NULL));    // 随机种子调用一次即可
 	
-	cout << "before read" << endl;
+//	cout << "before read" << endl;
 	read();
-	cout << "read over" << endl;
+//	cout << "read over" << endl;
 	printRS();
 //	printBW();
 //	printUsage();
@@ -424,24 +423,24 @@ int main() {
 
 //	printBW();
 	// 选择参与此次调整的已分配服务链 
-//	classify();
-//	
-//	// 策略更新 
-//	for(int times = 0; times < 300; ++times) {
+	classify();
+	
+	// 策略更新 
+	for(int times = 0; times < 1000; ++times) {
 //		cout<<"第"<<times<<"次："<<endl;
-////		printRS();
-//		
-//		action();
-////		printUsage();
-////		cout<<endl;
-//	}
+//		printRS();
+		
+		action();
+//		printUsage();
+//		cout<<endl;
+	}
 	
 	stop = GetTickCount();  
     printf("\n运行时间: %lld ms\n", stop - start);
 
-//	printChoice();
-//	printUsage();
-//	printBW();
-//	printRS();
+	printChoice();
+	printUsage();
+	printBW();
+	printRS();
 
 }
