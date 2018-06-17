@@ -6,6 +6,14 @@ int getLength(int seq[], int maxLen) {
 	return l;
 }
 
+void segment(int p[], int* i) {
+	while(*i < 16 && p[*i] > 26 && p[*i] < 41) {
+//		cout << *i << "节点是：" << p[(*i)] << endl;
+		(*i)++;
+	}
+	(*i)++;
+}
+
 float singleCost(int i, struct CFC Chains[], int ins) { 
 	double cff = 0.0, cu = 0.0;
 //	CF = chain_failure_cost[Input_Chains[i].service_type];
@@ -15,28 +23,51 @@ float singleCost(int i, struct CFC Chains[], int ins) {
 //		cout<<cff<<endl;
 	}
 //	cout<<endl;
-	int samepath[MAX_PATH_LENGTH] = {0};
-
-	int l1 = getLength(Chains[i].update[ins].upath, MAX_PATH_LENGTH);
-	int l2 = getLength(Chains[i].ini_path, MAX_PATH_LENGTH);
-
-	int samelength = lcs(Chains[i].update[ins].upath, l1, Chains[i].ini_path, l2, samepath);
-
+	
+	int count = 0, start1 = 0, end1 = 0, start2 = 0, end2 = 0;
 	bool firstnotsame = 1;
-	int s = samelength - 1, count = 0, node = 0;
-	for(int step = 0; (node = Chains[i].update[ins].upath[step]) > 0; ++step) {
-		if(samepath[s] != node) {
-			if(firstnotsame) {
-				firstnotsame = 0;
-				count++;
-			}
-			else count++;	
+	if(Chains[i].update[ins].upath[start1] == 0) count = 0;    // upath 无路径, 无更新开销
+	else if(Chains[i].ini_path[start2] == 0) {
+		int l1 = getLength(Chains[i].update[ins].upath, 16);
+		count = l1 - 1;    // 原先没有路径, 更新节点是 upath 的长度减去 1（汇聚节点）
+	}
+	else {
+		while(Chains[i].update[ins].upath[end1] != 0 && Chains[i].ini_path[end2] != 0) {
+			segment(Chains[i].update[ins].upath, &end1);    // 截到服务节点或汇聚节点的下一个节点 index 
+			segment(Chains[i].ini_path, &end2);
+	//		cout << start1 << " " << end1 << " " << start2 << " " << end2 << endl;
+	//		int l1 = getLength(test1, start1, end1);
+	//		int l2 = getLength(test2, start2, end2);
+			int samepath[16] = {0};
+			int l1 = end1 - start1;
+			int l2 = end2 - start2;
+			int samelength = lcs(Chains[i].update[ins].upath + start1, l1, Chains[i].ini_path + start2, l2, samepath);
+//			cout << "samelength：" << samelength << endl;
+	
+			int s = samelength - 1, node;
+			for(int step = start1; step < end1; ++step) {
+//				cout << test1[step] << " ";
+				if(samepath[s] != Chains[i].update[ins].upath[step]) {    // 节点不相等, upath 到下一个节点, 并累加 count 
+					if(firstnotsame) {
+						firstnotsame = 0;
+						count++;
+					}
+					count++;	
+				}
+				else {
+					firstnotsame = 1;    // 路径重合时, firstnotsame 置 1 
+					s--;                 // 节点相等, samepath 和 upath 都到下一个节点 
+				} 
+//				cout << count << endl;
+			}	
+	
+//			cout << "count：" << count << endl; 
+			start1 = end1;    // 跳过这个服务节点, 不然会一直循环 
+			start2 = end2;
 		}
-		s--;
-	} 
-	count--;    // 汇聚节点不需要更新 
-//	cout<<"需要发送更新消息的点："<<count<<endl;
+	}
 	cu = count * update_msg_cost;
+//	cout<<"需要发送更新消息的点："<<count<<endl;
 	
 //	cout<<Chains[i].service_type<<" "<<ins<<endl;
 //	cout<<"NF："<<Chains[i].node<<endl;	
@@ -108,4 +139,69 @@ float newCost(struct CFC Chains[], int i, int ins) {
 //	cout<<newT<<endl;
 	return newT;
 }
+
+//int main() {
+//	double cu = 0.0;
+//
+////	int test2[16] = {1, 28, 37, 40, 41, 40, 38, 31, 10, 0, 0, 0, 0, 0, 0, 0};     // ini_path
+////	int test1[16] = {1, 28, 37, 39, 40, 41, 40, 38, 31, 10, 0, 0, 0, 0, 0, 0};    // upath
+//	
+////	int test2[16] = {9, 30, 37, 40, 45, 40, 38, 33, 18, 0, 0, 0, 0, 0, 0, 0};     // ini_path
+////	int test1[16] = {9, 30, 42, 30, 37, 38, 33, 18, 0, 0, 0, 0, 0, 0, 0, 0};      // upath
+//
+////	int test2[16] = {0};     // ini_path
+////	int test1[16] = {1, 28, 37, 39, 40, 41, 40, 38, 31, 10, 0, 0, 0, 0, 0, 0};    // upath
+//
+//	int test2[16] = {1, 28, 37, 40, 41, 40, 38, 31, 10, t0, 0, 0, 0, 0, 0, 0};     // ini_path
+//	int test1[16] = {0};    // upath
+//
+//	int count = 0, start1 = 0, end1 = 0, start2 = 0, end2 = 0;
+//	bool firstnotsame = 1;
+//	if(test1[start1] == 0) count = 0;    // upath 无路径, 无更新开销
+//	else if(test2[start2] == 0) {
+//		int l1 = getLength(test1, 16);
+//		count = l1 - 1;    // 原先没有路径, 更新节点是 upath 的长度减去 1（汇聚节点）
+//	}
+//	else {
+//		while(test1[end1] != 0 && test2[end2] != 0) {
+//			segment(test1, &end1);    // 截到服务节点或汇聚节点的下一个节点 index 
+//			segment(test2, &end2);
+//	//		cout << start1 << " " << end1 << " " << start2 << " " << end2 << endl;
+//	//		int l1 = getLength(test1, start1, end1);
+//	//		int l2 = getLength(test2, start2, end2);
+//			int samepath[16] = {0};
+//			int l1 = end1 - start1;
+//			int l2 = end2 - start2;
+//			int samelength = lcs(test1 + start1, l1, test2 + start2, l2, samepath);
+//			cout << "samelength：" << samelength << endl;
+//	
+//			int s = samelength - 1, node;
+//			for(int step = start1; step < end1; ++step) {
+//				cout << test1[step] << " ";
+//				if(samepath[s] != test1[step]) {    // 节点不相等, upath 到下一个节点, 并累加 count 
+//					if(firstnotsame) {
+//						firstnotsame = 0;
+//						count++;
+//					}
+//					count++;	
+//				}
+//				else {
+//					firstnotsame = 1;    // 路径重合时, firstnotsame 置 1 
+//					s--;                 // 节点相等, samepath 和 upath 都到下一个节点 
+//				} 
+//				cout << count << endl;
+//			}	
+//	
+//			cout << "count：" << count << endl; 
+//			start1 = end1;    // 跳过这个服务节点, 不然会一直循环 
+//			start2 = end2;
+//		}
+//	}
+//	
+//		
+////	cout<<"需要发送更新消息的点："<<count<<endl;
+//	cu = count * 0.2;
+//	cout << "cu: " << cu << endl;
+//	return 0;
+//}
 

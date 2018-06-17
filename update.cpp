@@ -82,7 +82,10 @@ bool checkCapacity(struct CFC Chains[], int i, int ins) {
 	
 	if(unode != 41) {
 		int tmp = (int)((node_vnf_demand[unode - 42][uphy] + demand + unit_rps[uphy] - 1)/unit_rps[uphy]) - node_vnf_count[unode - 42][uphy];
+//		cout << "需要新实例化" << tmp << "个虚拟机" << endl;
+//		cout << "剩余资源：" << RS[unode - 42][0] << " " << RS[unode - 42][1] << endl;
 		if(RS[unode - 42][0] >= tmp * node_resource[uphy][0] && RS[unode - 42][1] >= tmp * node_resource[uphy][1]) { 
+//			cout << "剩余资源够新实例化" << endl; 
 			flag = true;    // 该节点的剩余资源够新实例化 tmp 个虚拟机
 		} 	
 	}

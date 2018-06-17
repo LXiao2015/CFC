@@ -1,12 +1,13 @@
 using namespace std;
+#include "experiment.h"
 
 #define NUM_OF_CHAIN_TYPES 5
-#define NUM_OF_INPUT_CHAINS 10
+
 #define NUM_OF_FEATURES 6
 #define NUM_OF_NODES 45
 #define NUM_OF_NFNODES 5
 #define NUM_OF_CLOUDS 4
-#define NUM_OF_ALLOCATED_CHAINS 15
+
 //#define NUM_OF_FEATURES 8
 
 #define MAX_PATH_LENGTH 16
@@ -329,8 +330,6 @@ double prop[NUM_OF_NF] = {0.9, 0.8, 0.7};
 
 int from[NUM_OF_PATH] = {0}, to[NUM_OF_PATH] = {0};
 
-double multiplier = 1.0;
-
 
 
 // 类型 实现方式 与对应的prop
@@ -351,4 +350,6 @@ double multiplier = 1.0;
 //4 0
 //4 1  0.7 
 
-
+//f3  (0,2) (1,1)
+//f5  (2,1) (3,1)
+//f6  (3,2) (4,1)

@@ -41,6 +41,7 @@ void printRS() {
 		}
 		cout<<endl;
 	}
+	cout << CAP << endl;
 }
 
 void printUsage() {
@@ -88,3 +89,20 @@ void printCost() {
 	C += CI;
 	cout << C << endl;
 } 
+
+void printFeature() {
+	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
+		int ins = Input_Chains[i].ins, type = Input_Chains[i].service_type;
+		for(int j = 0; j < NUM_OF_FEATURES; ++j) {
+			cout<<chain_types[type][ins][j]<<" ";
+		}
+		cout<<endl;
+	}
+	for(int i = 0; i < NUM_OF_ALLOCATED_CHAINS; ++i) {
+		int ins = Allocated_Chains[i].ins, type = Allocated_Chains[i].service_type;
+		for(int j = 0; j < NUM_OF_FEATURES; ++j) {
+			cout<<chain_types[type][ins][j]<<" ";
+		}
+		cout<<endl;
+	}
+}

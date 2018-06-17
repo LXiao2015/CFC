@@ -70,7 +70,7 @@ void allocated_chains() {
 	
 	// 读取原先服务链的 src sink type demand
 //	cout<<"读取原先服务链的 src sink type demand 开始"<<endl;
-	infile.open("result\\20180606 15A 10I\\prepare\\former_cfc.txt");    // 需要用双反斜杠, 或一个正斜杠 
+	infile.open(dir + "former_cfc.txt");    // 需要用双反斜杠, 或一个正斜杠 
 //	cout<<"读取成功"<<endl;
 	while(getline(infile, s)) {  
     	bool temp = false;
@@ -93,7 +93,7 @@ void allocated_chains() {
 	    Allocated_Chains[c].src = d[0];
 	    Allocated_Chains[c].sink = d[1];
 	    Allocated_Chains[c].service_type = d[2] - 1;    // CPLEX 中的类型计数从 1 开始
-	    Allocated_Chains[c].demand = d[3];
+	    Allocated_Chains[c].demand = d[3] * multiplier;    // 在一开始就要乘以系数, 后面就开始扣除资源了 
 	    c++;
 	}
 //	for(c = 0; c < NUM_OF_ALLOCATED_CHAINS; ++c) {
@@ -104,7 +104,7 @@ void allocated_chains() {
 
 	// 读取 feature 选择 
 	//	cout<<"读取 feature 选择开始"<<endl; 
-	infile.open("result\\20180606 15A 10I\\prepare\\f_choice.txt");
+	infile.open(dir + "f_choice.txt");
 //	cout<<"读取成功"<<endl;
 	c = 0;
 	
@@ -148,7 +148,7 @@ void allocated_chains() {
 //	cout<<"读取 feature 选择成功"<<endl; 
 
 	
-	infile.open("result\\20180606 15A 10I\\prepare\\raw.txt"); 
+	infile.open(dir + "raw.txt"); 
 	
 	// 读取路径段 
 //	cout<<"读取路径段开始"<<endl; 
@@ -235,7 +235,7 @@ void allocated_chains() {
 //		cout << "------------" << endl;
 		c++;
 	}
-	cout<<"存储路径选择成功"<<endl;
+//	cout<<"存储路径选择成功"<<endl;
 	infile.close();
 
 } 
@@ -244,7 +244,7 @@ void input_chains() {    // 输入服务链参数(源、目、类型)
 
 	string s;
 	ifstream infile; 
-    infile.open("result\\20180606 15A 10I\\prepare\\input_chains.txt"); 
+    infile.open(dir + "input_chains.txt"); 
 	int c = 0; 
     while(getline(infile, s)) {  
     	bool temp = false;
@@ -267,7 +267,7 @@ void input_chains() {    // 输入服务链参数(源、目、类型)
 	    Input_Chains[c].src = d[0];
 	    Input_Chains[c].sink = d[1];
 	    Input_Chains[c].service_type = d[2] - 1;
-	    Input_Chains[c].demand = d[3];
+	    Input_Chains[c].demand = d[3] * multiplier;
 //	    cout<<Input_Chains[c].src<<" "<<Input_Chains[c].sink<<" "<<Input_Chains[c].service_type<<" "<<Input_Chains[c].demand<<endl;
 	    c++;
     }  
@@ -310,12 +310,4 @@ void read() {
 //	allocated_paths();
 	
 	input_chains();
-	
-	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
-		Input_Chains[i].demand *= multiplier;
-	}
-
-	for(int c = 0; c < NUM_OF_ALLOCATED_CHAINS; ++c) {
-		Allocated_Chains[c].demand *= multiplier;
-	}
 }

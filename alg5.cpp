@@ -25,10 +25,12 @@ void chooseNode(int i, bool *nf_done, struct CFC Chains[], int type, int ins) {
 			if(!checkCapacity(Chains, i, ins)) {
 //				cout<<"新节点用不了"<<endl;
 				Chains[i].update[ins].unode = Chains[i].node;
-				Chains[i].update[ins].uphy = Chains[i].phy;
-				if(Chains[i].node <= 0) {    // 原先也没有 NF 节点, 这种实现方式失败 
+//				Chains[i].update[ins].uphy = Chains[i].phy;
+				if(Chains[i].node <= 0 || !checkCapacity(Chains, i, ins)) {    // 原先也没有 NF 节点, 或用原先的节点也不够完成，这种实现方式失败 
+//					cout << "旧节点也用不了" << endl;
 					*nf_done = true;
 					Chains[i].update[ins].succ = false;
+					Chains[i].update[ins].uphy = Chains[i].phy;
 				}
 				return;
 			}
@@ -215,19 +217,19 @@ void classify() {
 	for(int i = 0; i < NUM_OF_ALLOCATED_CHAINS; ++i) {
 //		double Pc = pow(Allocated_Chains[i].cost/sumC, 1.0/(double)NUM_OF_ALLOCATED_CHAINS);
 //		double Pc = Allocated_Chains[i].cost/sumC;
-//		float Pc = Allocated_Chains[i].fT;
-//		int pr = rand()%(highC - lowC) + lowC;
-//
-//		if(pr - Pc < 0) {
-//			realc[count++] = i;
-//		}
-		realc[count++] = i;  // 全加进来试试 
+		double Pc = Allocated_Chains[i].fT;
+		int pr = rand()%(highC - lowC) + lowC;
+
+		if(pr - Pc < 0) {
+			realc[count++] = i;
+		}
+//		realc[count++] = i;  // 全加进来试试 
 	}
 	num_of_realc = count;
-//	cout<<"选择已分配的服务链："<<endl;
-//	for(int i = 0; realc[i] >= 0; ++i) {
-//		cout<<realc[i]<<" ";
-//	}
+	cout<<"选择已分配的服务链："<<endl;
+	for(int i = 0; realc[i] >= 0; ++i) {
+		cout<<realc[i]<<" ";
+	}
 }
 
 void update(int i, struct CFC Chains[], int ins, float update_cost) {
@@ -242,8 +244,12 @@ void update(int i, struct CFC Chains[], int ins, float update_cost) {
 //		cout<<Chains[i].update[ins].upath[step]<<" ";
 //	}
 //	cout << endl;
-//	
+
 //	cout << "节点选择变化：" << Chains[i].node << " " << Chains[i].update[ins].unode << endl;
+//	cout << "类型：" << Chains[i].service_type << "  " << "ins变化：" << Chains[i].ins << ins << endl; 
+//	cout << "phy变化：" << Chains[i].phy << Chains[i].update[ins].uphy << endl; 
+	
+//	cout << "流量大小：" << Chains[i].demand << endl;
 	updateTraffic(Chains[i].path, Chains[i].update[ins].upath, Chains[i].demand, Chains[i].phy, Chains[i].update[ins].uphy);
 	updateCapacity(Chains, i, ins);
 	
@@ -258,7 +264,7 @@ void update(int i, struct CFC Chains[], int ins, float update_cost) {
 	
 	// update T
 	T = update_cost;
-	cout<<T<<endl;
+//	cout<<T<<endl;
 //	printCost();
 }
 
@@ -404,9 +410,9 @@ int main() {
 	printRS();
 //	printBW();
 //	printUsage();
-	DWORD start, stop;  
+	DWORD start, stop1 = 0, stop2;  
     start = GetTickCount(); 
-    
+    stop1 = start;
 //    printRS();
 	// 将所有新服务链的先选一种初始配置 
 	init();
@@ -424,22 +430,29 @@ int main() {
 //	printBW();
 	// 选择参与此次调整的已分配服务链 
 	classify();
-	
+//	
 	// 策略更新 
-	for(int times = 0; times < 105; ++times) {
+	for(int times = 0; times < 300; ++times) {
 //		cout<<"第"<<times<<"次："<<endl;
 //		printRS();
-		
+		stop2 = GetTickCount();  
+		if((stop2 - stop1) >= 10) {
+			printf("\n运行时间: %lld ms\n", stop2 - start);
+			cout << T << endl;
+			stop1 = stop2;
+		}
 		action();
 //		printUsage();
 //		cout<<endl;
 	}
 	
-	stop = GetTickCount();  
-    printf("\n运行时间: %lld ms\n", stop - start);
+	stop2 = GetTickCount();  
+    printf("\n运行时间: %lld ms\n", stop2 - start);
 
 	printChoice();
+//	printFeature();
 	printUsage();
-	printBW();
+	printCost(); 
+//	printBW();
 	printRS();
 }
