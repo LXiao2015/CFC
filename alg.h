@@ -219,11 +219,11 @@ int node_vnf_count[NUM_OF_CLOUDS][3];
 //int chain_failure_cost[NUM_OF_CHAIN_TYPES] = {1, 2, 4, 8, 16};
 
 int feature_failure_cost[NUM_OF_CHAIN_TYPES][NUM_OF_FEATURES] = {
-	{32, 4, 32, 0, 0, 0},
-	{32, 0, 32, 0, 0, 0},
-	{32, 0, 0, 0, 32, 0},
-	{64, 0, 0, 0, 8, 64},
-	{64, 0, 0, 0, 0, 64}
+	{8, 4, 8, 0, 0, 0},
+	{8, 0, 8, 0, 0, 0},
+	{12, 0, 0, 0, 12, 0},
+	{12, 0, 0, 0, 6, 12},
+	{12, 0, 0, 0, 0, 12}
 };
 
 double update_msg_cost = 0.2;
@@ -231,11 +231,11 @@ double update_msg_cost = 0.2;
 int num_of_realc = 0;
 
 // 拓扑带宽
-double h_s = 8000.0;
-double s_r = 8000.0;
-double s_e = 8000.0;
-double r_r = 8000.0;
-double n_r = 16000.0;
+double h_s = 4000.0;
+double s_r = 4000.0;
+double s_e = 4000.0;
+double r_r = 4000.0;
+double n_r = 8000.0;
 
 double BW[NUM_OF_NODES][NUM_OF_NODES] = {
 	/*
@@ -308,7 +308,7 @@ double RS[NUM_OF_CLOUDS][2] = {
 	{20.0, 3000.0},
 	{20.0, 3000.0},
 	{20.0, 3000.0},
-	{80.0, 20000.0}
+	{80.0, 12000.0}
 };
 
 double node_using_cost[NUM_OF_NFNODES] = {0, 0.2, 0.2, 0.2, 0.1};
@@ -320,7 +320,7 @@ double node_resource[NUM_OF_NF][2] = {
 	{1.0, 200.0},
 	{1.0, 500.0}
 };
-double CAP = 20000;
+double CAP = 15000;
 
 //float resource_cost_of_node[NUM_OF_NFNODES] = {1, 2, 2, 2, 3};    // 这里需要改
 

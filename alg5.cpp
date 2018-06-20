@@ -7,6 +7,24 @@
 
 using namespace std;
 
+void swap(int array[], int i, int j) {  
+    int temp = array[i];  
+    array[i] = array[j];  
+    array[j] = temp;  
+}
+
+void sortMaxLeftMemCloud(int cloud[], int n) {
+	for(int i = 0; i < n - 1; i++) {  
+        for(int j = i + 1; j < n; j++) {  
+            if(RS[cloud[i]-42][1] < RS[cloud[j]-42][1])  
+                swap(cloud, j, i);  
+        }  
+    }
+//    for(int i = 0; i < n; i++) {  
+//        cout << cloud[i] << " "; 
+//    }
+}
+
 void chooseNode(int i, bool *nf_done, struct CFC Chains[], int type, int ins) {
 	Chains[i].update[ins].succ = true;
 //	cout<<"第"<<i+1<<"条服务链："<<type<<" "<<Chains[i].ins<<" "<<ins<<endl; 
@@ -168,6 +186,61 @@ void choosePath(int i, bool *nf_done, struct CFC Chains[], int ins) {
 //	cout<<endl;
 }
 
+void chooseLargestNode(int i, bool *nf_done, struct CFC Chains[], int type, int ins) {
+	Chains[i].update[ins].succ = true;
+//	cout<<"第"<<i+1<<"条服务链："<<type<<" "<<Chains[i].ins<<" "<<ins<<endl; 
+
+	int phy = 0;    // 第 n 个物理特征
+	for(int f : phy_feature_set) {
+
+		if(chain_types[type][ins][f] == 1) {
+			*nf_done = false;
+//			cout<<"nf_done："<<*nf_done<<endl; 
+//			cout<<"物理特征："<<chain_types[type][ins][f]<<endl;
+			
+//			Chains[i].update[ins].unode = service_nodes[phy][rand()%count_of_nfnode[phy]];    // 随机挑选 NF 节点 
+			
+			// 挑选最近的 NF 节点 
+			if(type < 2) {
+				Chains[i].update[ins].unode = 41;
+				if(!checkCapacity(Chains, i, ins)) {
+//					cout<<"新节点41用不了"<<endl;
+					Chains[i].update[ins].unode = Chains[i].node;
+				}
+				else return;
+			}
+//			switch(Chains[i].src) {
+//				case 7: case 8: case 9:  
+//					Chains[i].update[ins].unode = 42; break;
+//				case 16: case 17: case 18:
+//					Chains[i].update[ins].unode = 43; break;
+//				case 25: case 26: case 27:
+//					Chains[i].update[ins].unode = 44; break;
+//				default: Chains[i].update[ins].unode = 45; break;
+//			} 
+			int maxLeftMemCloud[4] = {42, 43, 44, 45};
+			sortMaxLeftMemCloud(maxLeftMemCloud, 4);
+			
+			Chains[i].update[ins].uphy = phy;
+//			cout<<"新节点："<<Chains[i].update[ins].unode<<endl;
+			for(int node = 0; node < 4; node++) {
+				Chains[i].update[ins].unode = maxLeftMemCloud[node];
+				if(!checkCapacity(Chains, i, ins)) {
+					Chains[i].update[ins].succ = false; 
+//					cout<<"节点不能用"<<endl;
+				}
+					
+				else {	
+					Chains[i].update[ins].succ = true;
+//					cout<<"节点能用"<<endl;
+					return;
+				}
+			}
+		}
+		phy++;    // 换了位置 
+	}
+}
+
 void init() {
 
 	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {	
@@ -179,7 +252,11 @@ void init() {
 //		Input_Chains[i].ins = ins;
 //		cout<<"I 初始 - "<<i<<endl;
 		if(ins != 0) {
+			// 先随机选，失败则选一个剩余最大的 
 			chooseNode(i, &nf_done, Input_Chains, type, ins);   // 失败后恢复 
+			if(Input_Chains[i].update[ins].succ == false) {
+				chooseLargestNode(i, &nf_done, Input_Chains, type, ins);   // 失败后恢复
+			} 
 			if(Input_Chains[i].update[ins].succ != false) {
 				// 挑选路径
 				choosePath(i, &nf_done, Input_Chains, ins);   // 失败后恢复
@@ -432,7 +509,7 @@ int main() {
 	classify();
 //	
 	// 策略更新 
-	for(int times = 0; times < 300; ++times) {
+	for(int times = 0; times < 3000; ++times) {
 //		cout<<"第"<<times<<"次："<<endl;
 //		printRS();
 		stop2 = GetTickCount();  
@@ -445,14 +522,14 @@ int main() {
 //		printUsage();
 //		cout<<endl;
 	}
+
+	printChoice();
 	
 	stop2 = GetTickCount();  
     printf("\n运行时间: %lld ms\n", stop2 - start);
-
-	printChoice();
 //	printFeature();
 	printUsage();
 	printCost(); 
-//	printBW();
+	printBW();
 	printRS();
 }
