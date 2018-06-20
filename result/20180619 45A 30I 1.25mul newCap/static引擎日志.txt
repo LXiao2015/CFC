@@ -1,0 +1,94 @@
+CPXPARAM_TimeLimit                               18000
+CPXPARAM_DetTimeLimit                            18000
+CPXPARAM_MIP_Cuts_Cliques                        -1
+CPXPARAM_MIP_Cuts_Covers                         -1
+CPXPARAM_Preprocessing_BoundStrength             0
+CPXPARAM_MIP_Cuts_FlowCovers                     -1
+CPXPARAM_MIP_Cuts_Implied                        -1
+CPXPARAM_MIP_Cuts_GUBCovers                      -1
+CPXPARAM_MIP_Cuts_Gomory                         -1
+CPXPARAM_MIP_Cuts_PathCut                        -1
+CPXPARAM_MIP_Cuts_MIRCut                         -1
+CPXPARAM_MIP_Cuts_Disjunctive                    -1
+CPXPARAM_MIP_Strategy_Search                     1
+CPXPARAM_MIP_Cuts_ZeroHalfCut                    -1
+CPXPARAM_MIP_Cuts_MCFCut                         -1
+CPXPARAM_MIP_Cuts_LocalImplied                   -1
+CPXPARAM_MIP_Cuts_BQP                            -1
+Found incumbent of value 1702.000000 after 0.03 sec. (17.44 ticks)
+Tried aggregator 2 times.
+MIP Presolve eliminated 474830 rows and 320135 columns.
+MIP Presolve modified 268 coefficients.
+Aggregator did 19732 substitutions.
+Reduced MIP has 33060 rows, 26898 columns, and 205818 nonzeros.
+Reduced MIP has 26886 binaries, 12 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.73 sec. (661.33 ticks)
+Probing fixed 1951 vars, tightened 0 bounds.
+Probing time = 1.25 sec. (213.82 ticks)
+Tried aggregator 2 times.
+MIP Presolve eliminated 2383 rows and 2579 columns.
+MIP Presolve modified 8563 coefficients.
+Aggregator did 52 substitutions.
+Reduced MIP has 30625 rows, 24111 columns, and 175938 nonzeros.
+Reduced MIP has 24099 binaries, 12 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.41 sec. (325.16 ticks)
+Probing time = 0.11 sec. (9.86 ticks)
+Tried aggregator 1 time.
+Reduced MIP has 30625 rows, 24111 columns, and 175938 nonzeros.
+Reduced MIP has 24099 binaries, 12 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.20 sec. (98.54 ticks)
+Probing time = 0.03 sec. (9.24 ticks)
+Clique table members: 106420.
+MIP emphasis: balance optimality and feasibility.
+MIP search method: traditional branch-and-cut.
+Parallel mode: deterministic, using up to 4 threads.
+Root relaxation solution time = 1.08 sec. (370.54 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap         Variable B NodeID Parent  Depth
+
+*     0+    0                         1702.0000        0.0000           100.00%
+      0     0      137.6761  1213     1702.0000      137.6761     4212   91.91%
+*     0+    0                          162.3000      137.6761            15.17%
+      0     0      137.8891   956      162.3000   LiftProj: 2     4282   15.04%
+      0     2      137.8891   956      162.3000      137.8891     4282   15.04%                        0             0
+Elapsed time = 6.16 sec. (2841.38 ticks, tree = 0.01 MB, solutions = 3)
+*    17+    2                          149.9000      138.2319             7.78%
+*    22+    2                          149.5000      138.2319             7.54%
+     22    15      153.1963   263      149.5000      138.2319     5906    7.54%        used(43) U     11      7      3
+*    24+    2                          144.3000      138.2319             4.21%
+*    26+    2                          143.9000      138.2319             3.94%
+     47    14      138.2332   236      143.9000      138.2333     7328    3.94%        used(44) U     43      3      2
+     93    37      138.2333    52      143.9000      138.2333     7897    3.94%allocate#40#3#43 D    117    113     14
+    176   103      138.2333    38      143.9000      138.2333     8227    3.94%allocate#48#3#41 D    239    235     48
+    237   179      138.2333    41      143.9000      138.2333     8682    3.94%allocate#58#3#41 D    240    236     44
+    282   210      138.2333    67      143.9000      138.2333     9349    3.94%allocate#21#3#41 N    301     22      9
+    349   256      138.4967    34      143.9000      138.2333     9683    3.94%allocate#18#2#41 U    399    391     77
+    411   347      143.8000    26      143.9000      138.2333    10156    3.94%allocate#26#2#43 N    441    437     43
+    448   369      143.8000    30      143.9000      138.2333    10454    3.94%instance_count(4 D    509    501     59
+    708   539      141.4833    53      143.9000      138.2333    12828    3.94%allocate#73#2#41 D    675    671     80
+Elapsed time = 16.13 sec. (6046.09 ticks, tree = 98.87 MB, solutions = 7)
+   1000   752      138.2333    46      143.9000      138.2333    16965    3.94%instance_count(4 D   1016   1008     46
+   1296   971      138.6718    78      143.9000      138.2333    21086    3.94%     flow#119#46 U   1263   1259     32
+   1541  1112      139.1154    79      143.9000      138.2333    24809    3.94%instance_count(4 D   1442   1434     16
+   1847  1399        cutoff            143.9000      138.2333    28015    3.94%    flow#1177#17 U   1868   1864     48
+   2114  1565    infeasible            143.9000      138.2333    31987    3.94%instance_count(4 D   2285   2277     65
+   2404  1785      138.2333    44      143.9000      138.2333    38306    3.94%instance_count(4 D   2436   2432     29
+   2630  1916      139.1154    91      143.9000      138.2333    43433    3.94%instance_count(4 D   2582   2578     13
+   2826  2048      141.1667    66      143.9000      138.2333    50870    3.94%instance_count(4 D   2795   2791     37
+   3042  2185      139.5179    95      143.9000      138.2333    56653    3.94%allocate#13#3#42 U   2999   2995     43
+   3285  2330      139.0333    56      143.9000      138.2333    62549    3.94%instance_count(4 D   3235   3231     17
+Elapsed time = 51.98 sec. (15614.84 ticks, tree = 146.11 MB, solutions = 7)
+   3483  2454      142.9436    83      143.9000      138.2333    67292    3.94%     flow#827#25 D   3498   3494     27
+   3734  2576      138.6231    67      143.9000      138.2333    73710    3.94%instance_count(4 D   3746   2094     32
+
+Lift and project cuts applied:  2
+
+Root node processing (before b&c):
+  Real time             =    6.16 sec. (2833.60 ticks)
+Parallel b&c, 4 threads:
+  Real time             =   53.48 sec. (15207.66 ticks)
+  Sync time (average)   =    5.20 sec.
+  Wait time (average)   =    0.02 sec.
+                          ------------
+Total (root+branch&cut) =   59.64 sec. (18041.26 ticks)
