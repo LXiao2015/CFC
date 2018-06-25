@@ -395,13 +395,12 @@ void action() {
 //				cout<<"新输入服务链"<<c<<"的"<<ins<<"新cost："<<endl;
 				Allocated_Chains[c].update[ins].uT = singleCost(c, Allocated_Chains, ins);
 			}
-
 		}	
 	}
 
-//	double max_perform = -100.0;
-//	double max_perform = 0.0;
-	double min_perform = 1000.0, Qf; 
+//	double max_perform = -1000.0;
+	double min_perform = 1000.0;
+	double Qf; 
 	int update_chain = -1, update_ins = -1;
 	float update_cost;
 	double b = 7.0, t = 3.0;
@@ -417,7 +416,9 @@ void action() {
 			float new_cost = newCost(Input_Chains, i, ins) + Input_Chains[i].update[ins].uT - Input_Chains[i].fT;
 //			cout<<i<<"!!!!!"<<new_cost<<" "<<T<<endl;
 //			Qf = exp(t - b*(Input_Chains[i].cost - Input_Chains[i].update[ins].ucost))/num_of_ins[type];
-			Qf = exp(t - b*(1/new_cost - 1/T))/4;    // 这里的分母应该是可选的 node 
+			Qf = exp(t - b*(1/new_cost - 1/T));    // 这里的分母应该是可选的 ins 
+//			Qf = T - new_cost;
+//			Qf = exp(t - b*(1/T - 1/new_cost));
 //			cout<<Qf<<endl;	
 //			if(Input_Chains[i].update[ins].ucost != Input_Chains[i].cost && min_perform > Qf) {
 			if(min_perform > Qf) {
@@ -444,7 +445,9 @@ void action() {
 			float new_cost = newCost(Allocated_Chains, c, ins) + Allocated_Chains[c].update[ins].uT - Allocated_Chains[c].fT;
 //			cout<<c<<"!!!!!"<<new_cost<<" "<<T<<endl;
 //			Qf = exp(t - b*(Allocated_Chains[c].cost - Allocated_Chains[c].update[ins].ucost))/num_of_ins[type];
-			Qf = exp(t - b*(1/new_cost - 1/T))/4;    // 这里的分母应该是可选的 node
+			Qf = exp(t - b*(1/new_cost - 1/T));    // 这里的分母应该是可选的 node 
+//			Qf = T - new_cost;
+//			Qf = exp(t - b*(1/T - 1/new_cost));
 //			cout<<Qf<<endl;		
 //			if(Allocated_Chains[c].update[ins].ucost != Allocated_Chains[c].cost && min_perform > Qf) {
 			if(min_perform > Qf) {
@@ -509,7 +512,7 @@ int main() {
 	classify();
 //	
 	// 策略更新 
-	for(int times = 0; times < 3000; ++times) {
+	for(int times = 0; times < 30; ++times) {
 //		cout<<"第"<<times<<"次："<<endl;
 //		printRS();
 		stop2 = GetTickCount();  
