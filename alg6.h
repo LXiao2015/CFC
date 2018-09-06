@@ -93,11 +93,10 @@ struct CFC {
 	int ini_path[MAX_PATH_LENGTH] = {0};
 	int path[MAX_PATH_LENGTH] = {0};    // 最长会有 14 个点
 	
-	struct Update update[3]; 
-//	int update_ins = 0;
-//	int update_phy = -1;
-//	int update_node = 0;
-//	int update_path[MAX_PATH_LENGTH] = {0};
+	int uins = 0;
+	int uphy = -1;
+	int unode = 0;
+	int upath[MAX_PATH_LENGTH] = {0};
 	double fT;
 } Input_Chains[NUM_OF_INPUT_CHAINS], Allocated_Chains[NUM_OF_ALLOCATED_CHAINS]; 
 
@@ -231,11 +230,11 @@ double update_msg_cost = 0.2;
 int num_of_realc = 0;
 
 // 拓扑带宽
-double h_s = 2500.0;
-double s_r = 2500.0;
-double s_e = 2500.0;
-double r_r = 2500.0;
-double n_r = 5000.0;
+double h_s = 4000.0;
+double s_r = 4000.0;
+double s_e = 4000.0;
+double r_r = 4000.0;
+double n_r = 8000.0;
 
 double BW[NUM_OF_NODES][NUM_OF_NODES] = {
 	/*

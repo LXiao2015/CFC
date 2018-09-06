@@ -137,7 +137,10 @@ void allocated_chains() {
 		for(int f : phy_feature_set) {
 			if(f_choice[f] == true) {
 				Allocated_Chains[c].update[num].uphy = phy;
+//				cout << Allocated_Chains[c].service_type << " " << endl;
 //				cout<<"phy："<<phy<<endl;
+//				cout << Allocated_Chains[c].ins << " = " << num << endl;
+//				cout << Allocated_Chains[c].update[Allocated_Chains[c].ins].uphy << " = " << Allocated_Chains[c].update[num].uphy << endl;
 			}
 			phy++;
 		}
@@ -217,6 +220,7 @@ void allocated_chains() {
 //		cout<<"合成路径"<<c<<"开始"<<endl;
 		Allocated_Chains[c].update[Allocated_Chains[c].ins].unode = composite(Allocated_Chains[c].update[Allocated_Chains[c].ins].upath, p_choice, Allocated_Chains[c].src, Allocated_Chains[c].sink);
 //		cout << "---" << endl;
+//		cout << Allocated_Chains[c].update[Allocated_Chains[c].ins].uphy << endl;
 		updateCapacity(Allocated_Chains, c, Allocated_Chains[c].ins);    // 必须在下一句之前 
 		Allocated_Chains[c].node = Allocated_Chains[c].update[Allocated_Chains[c].ins].unode;
 		

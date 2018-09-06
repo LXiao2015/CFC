@@ -115,6 +115,7 @@ void updateCapacity(struct CFC Chains[], int i, int ins) {
 	}
 	
 	double demand = Chains[i].demand;
+//	cout << demand << endl;
 	
 	if(node > 0) {
 //		cout << "有 node" << endl;
@@ -142,17 +143,17 @@ void updateCapacity(struct CFC Chains[], int i, int ins) {
 			node_vnf_demand[unode - 42][uphy] += demand;
 //			cout << node_vnf_demand[unode - 42][uphy] << endl;
 			tmp = node_vnf_count[unode - 42][uphy];
+//			cout << tmp << " ";
 			node_vnf_count[unode - 42][uphy] = (int)((node_vnf_demand[unode - 42][uphy] + unit_rps[uphy] - 1)/unit_rps[uphy]);
-
+//			cout << node_vnf_count[unode - 42][uphy] << endl;
 			tmp -= node_vnf_count[unode - 42][uphy];
-
+			
 			if(tmp != 0) {
 //				cout << "链" << i << "减去更新的" << tmp << "*" << node_resource[uphy][1] << endl;
 				for(int j = 0; j < 2; ++j) {
 					RS[unode - 42][j] += node_resource[uphy][j] * tmp;    // tmp 是负的, 相当于减去 
 				}
 			}
-
 		}
 		else CAP -= demand;    // 功能节点是物理节点
 	}

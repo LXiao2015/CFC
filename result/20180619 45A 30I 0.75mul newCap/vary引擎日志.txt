@@ -1,0 +1,75 @@
+CPXPARAM_TimeLimit                               18000
+CPXPARAM_DetTimeLimit                            18000
+CPXPARAM_MIP_Cuts_Cliques                        -1
+CPXPARAM_MIP_Cuts_Covers                         -1
+CPXPARAM_Preprocessing_BoundStrength             0
+CPXPARAM_MIP_Cuts_FlowCovers                     -1
+CPXPARAM_MIP_Cuts_Implied                        -1
+CPXPARAM_MIP_Cuts_GUBCovers                      -1
+CPXPARAM_MIP_Cuts_Gomory                         -1
+CPXPARAM_MIP_Cuts_PathCut                        -1
+CPXPARAM_MIP_Cuts_MIRCut                         -1
+CPXPARAM_MIP_Cuts_Disjunctive                    -1
+CPXPARAM_MIP_Strategy_Search                     1
+CPXPARAM_MIP_Cuts_ZeroHalfCut                    -1
+CPXPARAM_MIP_Cuts_MCFCut                         -1
+CPXPARAM_MIP_Cuts_LocalImplied                   -1
+CPXPARAM_MIP_Cuts_BQP                            -1
+Found incumbent of value 1684.000000 after 0.08 sec. (38.46 ticks)
+Tried aggregator 2 times.
+MIP Presolve eliminated 474470 rows and 318154 columns.
+MIP Presolve modified 988 coefficients.
+Aggregator did 20770 substitutions.
+Reduced MIP has 34830 rows, 27945 columns, and 217483 nonzeros.
+Reduced MIP has 27933 binaries, 12 generals, 0 SOSs, and 0 indicators.
+Presolve time = 1.00 sec. (709.26 ticks)
+Probing fixed 1979 vars, tightened 0 bounds.
+Probing time = 1.44 sec. (248.25 ticks)
+Tried aggregator 2 times.
+MIP Presolve eliminated 2435 rows and 2600 columns.
+MIP Presolve modified 9467 coefficients.
+Aggregator did 50 substitutions.
+Reduced MIP has 32345 rows, 25145 columns, and 186995 nonzeros.
+Reduced MIP has 25133 binaries, 12 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.47 sec. (343.62 ticks)
+Probing time = 0.05 sec. (9.91 ticks)
+Tried aggregator 1 time.
+Reduced MIP has 32345 rows, 25145 columns, and 186995 nonzeros.
+Reduced MIP has 25133 binaries, 12 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.19 sec. (102.38 ticks)
+Probing time = 0.05 sec. (9.82 ticks)
+Clique table members: 112457.
+MIP emphasis: balance optimality and feasibility.
+MIP search method: traditional branch-and-cut.
+Parallel mode: deterministic, using up to 4 threads.
+Root relaxation solution time = 0.28 sec. (142.38 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap         Variable B NodeID Parent  Depth
+
+*     0+    0                         1684.0000       36.0000            97.86%
+      0     0      178.4764    57     1684.0000      178.4764     1451   89.40%
+*     0+    0                          187.7000      178.4764             4.91%
+      0     0      179.8543   268      187.7000  LiftProj: 12     1987    4.18%
+*     0+    0                          182.7000      179.8543             1.56%
+      0     0      180.1914   240      182.7000   LiftProj: 6     2102    1.37%
+*     0+    0                          182.3000      180.1914             1.16%
+*     0+    0                          181.9000      180.1914             0.94%
+*     0+    0                          181.1000      180.1914             0.50%
+      0     2      180.1914   240      181.1000      180.1914     2102    0.50%                        0             0
+Elapsed time = 6.47 sec. (2792.30 ticks, tree = 0.01 MB, solutions = 7)
+*     1+    1                          180.7000      180.2928             0.23%
+      1     2      180.3212   217      180.7000      180.3049     2129    0.22%allocate#21#1#42 D      4      0      1
+      4     3      180.4096    67      180.7000      180.3049     2148    0.22%instance_count(4 U     11      7      3
+     11     2      180.4223    66      180.7000      180.3049     2188    0.22%flow_active#2#0# D     12      8      3
+
+Lift and project cuts applied:  14
+
+Root node processing (before b&c):
+  Real time             =    6.47 sec. (2787.38 ticks)
+Parallel b&c, 4 threads:
+  Real time             =    4.05 sec. (1452.92 ticks)
+  Sync time (average)   =    1.57 sec.
+  Wait time (average)   =    0.02 sec.
+                          ------------
+Total (root+branch&cut) =   10.52 sec. (4240.30 ticks)

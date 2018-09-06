@@ -26,7 +26,6 @@ void sortMaxLeftMemCloud(int cloud[], int n) {
 }
 
 void chooseNode(int i, bool *nf_done, struct CFC Chains[], int type, int ins) {
-	
 	Chains[i].update[ins].succ = true;
 //	cout<<"第"<<i+1<<"条服务链："<<type<<" "<<Chains[i].ins<<" "<<ins<<endl; 
 
@@ -36,24 +35,17 @@ void chooseNode(int i, bool *nf_done, struct CFC Chains[], int type, int ins) {
 		if(chain_types[type][ins][f] == 1) {
 			*nf_done = false;
 //			cout<<"nf_done："<<*nf_done<<endl; 
-
-//			if(type < 2) {
-//				Chains[i].update[ins].unode = 41;
-//				if(!checkCapacity(Chains, i, ins) || BW[39][40] < Chains[i].demand) {
-//					cout<<"新节点41用不了"<<endl;
-//					Chains[i].update[ins].unode = Chains[i].node;
-//				}
-//				else return;
-//			}
+//			cout<<"物理特征："<<chain_types[type][Chains[i].ins][f]<<endl;
+			
 			Chains[i].update[ins].unode = service_nodes[phy][rand()%count_of_nfnode[phy]];    // NF 节点序号 
 			Chains[i].update[ins].uphy = phy;
-//			if(i == 29) cout<<"新节点："<<Chains[i].update[ins].unode<<endl;
+//			cout<<"新节点："<<Chains[i].update[ins].unode<<endl;
 			if(!checkCapacity(Chains, i, ins)) {
-//				if(i == 29) cout<<"新节点用不了"<<endl;
+//				cout<<"新节点用不了"<<endl;
 				Chains[i].update[ins].unode = Chains[i].node;
 //				Chains[i].update[ins].uphy = Chains[i].phy;
 				if(Chains[i].node <= 0 || !checkCapacity(Chains, i, ins)) {    // 原先也没有 NF 节点, 或用原先的节点也不够完成，这种实现方式失败 
-//					if(i == 29) cout << "旧节点也用不了" << endl;
+//					cout << "旧节点也用不了" << endl;
 					*nf_done = true;
 					Chains[i].update[ins].succ = false;
 					Chains[i].update[ins].uphy = Chains[i].phy;
@@ -171,28 +163,21 @@ void choosePath(int i, bool *nf_done, struct CFC Chains[], int ins) {
 	} 
 	
 //	cout<<Chains[i].update[ins].unode<<endl;
-//    if(i == 29) {
-//    	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
-//			cout<<Chains[i].path[step]<<" ";
-//		}
-//		cout<<endl;
-//    	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
-//			cout<<Chains[i].update[ins].upath[step]<<" ";
-//		}
-//		cout<<endl;
+//	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
+//		cout<<Chains[i].update[ins].upath[step]<<" ";
 //	}
-	
+//	cout<<endl;
 	if(!checkTraffic(Chains[i].path, Chains[i].update[ins].upath, Chains[i].demand, Chains[i].phy, Chains[i].update[ins].uphy)) {
 		memcpy(Chains[i].update[ins].upath, Chains[i].path, MAX_PATH_LENGTH*4);
 		Chains[i].update[ins].unode = Chains[i].node;
 
 		Chains[i].update[ins].uphy = Chains[i].phy;
 		Chains[i].update[ins].succ = false;
-//		if(i == 29) cout<<"不够分配"<<endl;
+//		cout<<"不够分配"<<endl;
 	}
 	else {
 		Chains[i].update[ins].succ &= true;
-//		if(i == 29) cout<<"路径分配成功！"<<endl;
+//		cout<<"路径分配成功！"<<endl;
 	}
 //	cout<<Chains[i].update_node<<endl;
 //	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
@@ -295,77 +280,7 @@ void init() {
 			Input_Chains[i].fT = singleCost(i, Input_Chains, 0);
 		}
 	}
-	int count = 0;
-	for(int c: realc) {	
-		if(count++ >= num_of_realc) break;
-		bool nf_done = true;    // NF 是否已经过(或根本没有 NF) 
-		
-		int type = Allocated_Chains[c].service_type;    // 五种服务链中的哪一种
-		int ins = rand()%num_of_ins[type];    // 选择一种实现方式(考虑服务链分配失败)
-//		Input_Chains[i].ins = ins;
-//		cout<<"I 初始 - "<<i<<endl;
-		if(ins != 0) {
-			// 先随机选，失败则选一个剩余最大的 
-			chooseNode(c, &nf_done, Allocated_Chains, type, ins);   // 失败后恢复 
-			if(Allocated_Chains[c].update[ins].succ == false) {
-				chooseLargestNode(c, &nf_done, Allocated_Chains, type, ins);   // 失败后恢复
-			} 
-			if(Allocated_Chains[c].update[ins].succ != false) {
-				// 挑选路径
-				choosePath(c, &nf_done, Allocated_Chains, ins);   // 失败后恢复
-			}	
-			if(Allocated_Chains[c].update[ins].succ != false) {
-				// 扣除资源和带宽 
-				updateTraffic(Allocated_Chains[c].path, Allocated_Chains[c].update[ins].upath, Allocated_Chains[c].demand, Allocated_Chains[c].phy, Allocated_Chains[c].update[ins].uphy);
-				updateCapacity(Allocated_Chains, c, ins);
-				memcpy(Allocated_Chains[c].path, Allocated_Chains[c].update[ins].upath, 4*MAX_PATH_LENGTH);
-				
-				Allocated_Chains[c].ins = ins;
-				Allocated_Chains[c].phy = Allocated_Chains[c].update[ins].uphy;
-				Allocated_Chains[c].node = Allocated_Chains[c].update[ins].unode;
-			}
-		}
- 		if(Allocated_Chains[c].update[ins].succ != false) {
-			Allocated_Chains[c].fT = singleCost(c, Allocated_Chains, ins);	
-		}
-		else {
-			Allocated_Chains[c].fT = singleCost(c, Allocated_Chains, 0);
-		}
-	}
 } 
-
-void restore(int c) {
-	double dmd = Allocated_Chains[c].demand; 
-	int tmp;
-	int node = Allocated_Chains[c].node;
-	int phy = Allocated_Chains[c].phy;
-	for(int step = 1; Allocated_Chains[c].path[step] > 0; ++step) {
-		if(Allocated_Chains[c].path[step-1] >= 41) {
-			dmd *= prop[phy];
-		}
-		BW[Allocated_Chains[c].path[step-1]-1][Allocated_Chains[c].path[step]-1] += dmd;
-	}
-//	cout << node << " "<< unode << " "<< uphy << " "<< phy << endl;
-	
-	dmd = Allocated_Chains[c].demand;
-	if(node > 0) {
-//		cout << "有 node" << endl;
-		node_used[node - 41] -= 1;
-		if(node != 41) {	
-			node_vnf_demand[node - 42][phy] -= dmd;
-			tmp = node_vnf_count[node - 42][phy];
-			node_vnf_count[node - 42][phy] = (int)((node_vnf_demand[node - 42][phy] + unit_rps[phy] - 1)/unit_rps[phy]);
-			tmp -= node_vnf_count[node - 42][phy];
-			if(tmp != 0) {
-//				cout << "链" << i << "加上原先的" << tmp << "*" << node_resource[phy][1] << endl;
-				for(int j = 0; j < 2; ++j) {
-					RS[node - 42][j] += node_resource[phy][j] * tmp;
-				}
-			}
-		}
-		else CAP += dmd;
-	}
-}
 
 void classify() {
 //	cout<<"classify"<<endl;
@@ -388,17 +303,8 @@ void classify() {
 //		realc[count++] = i;  // 全加进来试试 
 	}
 	num_of_realc = count;
-	for(int i = count; i < NUM_OF_ALLOCATED_CHAINS; ++i) {
-		realc[i++] = -1;
-	}
 	cout<<"选择已分配的服务链："<<endl;
 	for(int i = 0; realc[i] >= 0; ++i) {
-		restore(realc[i]);
-		Allocated_Chains[realc[i]].ins = 0;
-		Allocated_Chains[realc[i]].phy = -1;    // 第几个物理特征 
-		Allocated_Chains[realc[i]].node = 0;
-		memset(Allocated_Chains[realc[i]].path, 0, 4*MAX_PATH_LENGTH);
-		Allocated_Chains[realc[i]].fT = singleCost(realc[i], Allocated_Chains, 0);
 		cout<<realc[i]<<" ";
 	}
 }
@@ -489,17 +395,15 @@ void action() {
 //				cout<<"新输入服务链"<<c<<"的"<<ins<<"新cost："<<endl;
 				Allocated_Chains[c].update[ins].uT = singleCost(c, Allocated_Chains, ins);
 			}
-
 		}	
 	}
 
-	double max_perform = -100.0;
-//	double max_perform = 0.0;
-//	double min_perform = 1000.0;
+//	double max_perform = -1000.0;
+	double min_perform = 1000.0;
 	double Qf; 
 	int update_chain = -1, update_ins = -1;
 	float update_cost;
-	double b = 0.007, t = 1.0;
+	double b = 7.0, t = 3.0;
 
 	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
 		int type = Input_Chains[i].service_type;
@@ -508,19 +412,18 @@ void action() {
 //				cout << i << "不参与更新" << endl;
 				continue;
 			}
-//			cout<<Input_Chains[i].update[ins].uT<<" - "<<Input_Chains[i].fT<<endl;
+//			cout<<newCost(Input_Chains, i, ins)<<" + "<<Input_Chains[i].update[ins].uT<<" - "<<Input_Chains[i].fT<<endl;
 			float new_cost = newCost(Input_Chains, i, ins) + Input_Chains[i].update[ins].uT - Input_Chains[i].fT;
-//			cout << i << "!!!!! " << T - new_cost << " ";
+//			cout<<i<<"!!!!!"<<new_cost<<" "<<T<<endl;
 //			Qf = exp(t - b*(Input_Chains[i].cost - Input_Chains[i].update[ins].ucost))/num_of_ins[type];
-//			Qf = exp(t - b*Input_Chains[i].demand*type*(1/new_cost - 1/T));    // 这里的分母应该是可选的 node 
-//			cout << Input_Chains[i].demand << " " << type << " " << ins << endl;
-//			Qf = Input_Chains[i].demand*type*(T - new_cost);
-			Qf = T - new_cost;
+			Qf = exp(t - b*(1/new_cost - 1/T));    // 这里的分母应该是可选的 ins 
+//			Qf = T - new_cost;
+//			Qf = exp(t - b*(1/T - 1/new_cost));
 //			cout<<Qf<<endl;	
 //			if(Input_Chains[i].update[ins].ucost != Input_Chains[i].cost && min_perform > Qf) {
-			if(max_perform <= Qf) {
+			if(min_perform > Qf) {
 	//			cout<<"I - "<<i<<"的cost变少了："<<" "<<Input_Chains[i].cost<<" "<<Input_Chains[i].update_cost<<endl;
-				max_perform = Qf;
+				min_perform = Qf;
 				update_chain = i;
 				update_ins = ins; 
 				update_cost = new_cost;
@@ -538,19 +441,18 @@ void action() {
 //				cout << c << " 不参与更新" << endl;
 				continue;
 			}
-//			cout<<Allocated_Chains[c].update[ins].uT<<" - "<<Allocated_Chains[c].fT<<endl;
+//			cout<<newCost(Input_Chains, c, ins)<<" + "<<Allocated_Chains[c].update[ins].uT<<" - "<<Allocated_Chains[c].fT<<endl;
 			float new_cost = newCost(Allocated_Chains, c, ins) + Allocated_Chains[c].update[ins].uT - Allocated_Chains[c].fT;
-//			cout << c << "!!!!! " << T - new_cost << " ";
+//			cout<<c<<"!!!!!"<<new_cost<<" "<<T<<endl;
 //			Qf = exp(t - b*(Allocated_Chains[c].cost - Allocated_Chains[c].update[ins].ucost))/num_of_ins[type];
-//			Qf = exp(t - b*Allocated_Chains[c].demand*type*(1/new_cost - 1/T));    // 这里的分母应该是可选的 node
-//			cout << Allocated_Chains[c].demand << " " << type << " " << ins << endl;
-//			Qf = Allocated_Chains[c].demand*type*(T - new_cost);
-			Qf = T - new_cost;
+			Qf = exp(t - b*(1/new_cost - 1/T));    // 这里的分母应该是可选的 node 
+//			Qf = T - new_cost;
+//			Qf = exp(t - b*(1/T - 1/new_cost));
 //			cout<<Qf<<endl;		
 //			if(Allocated_Chains[c].update[ins].ucost != Allocated_Chains[c].cost && min_perform > Qf) {
-			if(max_perform <= Qf) {
+			if(min_perform > Qf) {
 	//			cout<<"A - "<<c<<"的cost变少了："<<" "<<Allocated_Chains[c].cost<<" "<<Allocated_Chains[c].update_cost<<endl;
-				max_perform = Qf;
+				min_perform = Qf;
 				update_chain = c + NUM_OF_INPUT_CHAINS;
 				update_ins = ins;
 				update_cost = new_cost;
@@ -579,154 +481,6 @@ void action() {
 	}
 }
 
-
-//void action6() { 
-//	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
-//		int type = Input_Chains[i].service_type;    // 五种服务链中的哪一种
-////		cout<<"i = "<<i<<endl;
-//		int rins = rand()%num_of_ins[type];
-//		for(int ins = 0; ins < num_of_ins[type]; ++ins) {
-//			if(ins != rins) {
-//				Input_Chains[i].update[ins].succ == false;
-//				continue;
-//			}
-//			bool nf_done = true;
-////			cout<<"选取节点..."<<endl;
-//			chooseNode(i, &nf_done, Input_Chains, type, ins);
-////			cout<<"done！"<<endl;
-////			cout<<"清空路径..."<<endl;
-//			memset(Input_Chains[i].update[ins].upath, 0, MAX_PATH_LENGTH*4);
-////			cout<<"done！"<<endl; 
-//
-//			if(Input_Chains[i].update[ins].succ != false) {
-////				cout<<"选取路径..."<<endl;
-//				choosePath(i, &nf_done, Input_Chains, ins);
-////			    cout<<"done！"<<endl;		
-//			}
-//			if(Input_Chains[i].update[ins].succ != false) {
-////				cout<<"新输入服务链"<<i<<"的"<<ins<<"新cost："<<endl;
-//				Input_Chains[i].update[ins].uT = singleCost(i, Input_Chains, ins);
-//			}
-//		}
-//	}
-//	
-//	for(int c: realc) {
-//		if(c < 0) {
-//			break;
-//		}
-//		int type = Allocated_Chains[c].service_type;    // 五种服务链中的哪一种
-////		cout<<"c = "<<c<<endl;
-//        int rins = rand()%num_of_ins[type];
-//		for(int ins = 0; ins < num_of_ins[type]; ++ins) {
-//			if(ins != rins) {
-//				Allocated_Chains[c].update[ins].succ == false;
-//				continue;
-//			}
-//			bool nf_done = true;
-////			cout<<"选取节点..."<<endl;
-//			chooseNode(c, &nf_done, Allocated_Chains, type, ins);
-////			cout<<"done！"<<endl;
-////			cout<<"清空路径..."<<endl;
-//			memset(Allocated_Chains[c].update[ins].upath, 0, MAX_PATH_LENGTH*4);
-////			cout<<"done！"<<endl; 
-//
-//			if(Allocated_Chains[c].update[ins].succ != false) {
-////				cout<<"选取路径..."<<endl;
-//				choosePath(c, &nf_done, Allocated_Chains, ins);
-////			    cout<<"done！"<<endl;
-////				
-//			}
-//			if(Allocated_Chains[c].update[ins].succ != false) {
-////				cout<<"新输入服务链"<<c<<"的"<<ins<<"新cost："<<endl;
-//				Allocated_Chains[c].update[ins].uT = singleCost(c, Allocated_Chains, ins);
-//			}
-//		}	
-//	}
-//
-////	double max_perform = -1000.0;
-//	double min_perform = 1000.0;
-//	double Qf; 
-//	int update_chain = -1, update_ins = -1;
-//	float update_cost;
-//	double b = 0.0007, t = 1.0;
-//
-//	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
-//		int type = Input_Chains[i].service_type;
-//		for(int ins = 0; ins < num_of_ins[type]; ++ins) {
-//			if(Input_Chains[i].update[ins].succ == false) {
-////				cout << i << "不参与更新" << endl;
-//				continue;
-//			}
-////			cout<<newCost(Input_Chains, i, ins)<<" + "<<Input_Chains[i].update[ins].uT<<" - "<<Input_Chains[i].fT<<endl;
-//			float new_cost = newCost(Input_Chains, i, ins) + Input_Chains[i].update[ins].uT - Input_Chains[i].fT;
-////			cout<<i<<"!!!!!"<<new_cost<<" "<<T<<endl;
-////			Qf = exp(t - b*(Input_Chains[i].cost - Input_Chains[i].update[ins].ucost))/num_of_ins[type];
-//			Qf = exp(t - b*Input_Chains[i].demand*type*(1/new_cost - 1/T));    // 这里的分母应该是可选的 ins 
-////			Qf = T - new_cost;
-////			Qf = exp(t - b*(1/T - 1/new_cost));
-////			cout<<Qf<<endl;	
-////			if(Input_Chains[i].update[ins].ucost != Input_Chains[i].cost && min_perform > Qf) {
-//			if(min_perform > Qf) {
-//	//			cout<<"I - "<<i<<"的cost变少了："<<" "<<Input_Chains[i].cost<<" "<<Input_Chains[i].update_cost<<endl;
-//				min_perform = Qf;
-//				update_chain = i;
-//				update_ins = ins; 
-//				update_cost = new_cost;
-//			}
-//		} 
-//	}
-//	for(int c: realc) {
-//		if(c < 0) {
-//			break;
-//		}
-//		int type = Allocated_Chains[c].service_type;    // 五种服务链中的哪一种
-//		
-//		for(int ins = 0; ins < num_of_ins[type]; ++ins) {
-//			
-//			if(Allocated_Chains[c].update[ins].succ == false) {
-////				cout << c << " 不参与更新" << endl;
-//				continue;
-//			}
-////			cout<<newCost(Input_Chains, c, ins)<<" + "<<Allocated_Chains[c].update[ins].uT<<" - "<<Allocated_Chains[c].fT<<endl;
-//			float new_cost = newCost(Allocated_Chains, c, ins) + Allocated_Chains[c].update[ins].uT - Allocated_Chains[c].fT;
-////			cout<<c<<"!!!!!"<<new_cost<<" "<<T<<endl;
-////			Qf = exp(t - b*(Allocated_Chains[c].cost - Allocated_Chains[c].update[ins].ucost))/num_of_ins[type];
-//			Qf = exp(t - Allocated_Chains[c].demand*type*(1/new_cost - 1/T));    // 这里的分母应该是可选的 node 
-////			Qf = T - new_cost;
-////			Qf = exp(t - b*(1/T - 1/new_cost));
-////			cout<<Qf<<endl;		
-////			if(Allocated_Chains[c].update[ins].ucost != Allocated_Chains[c].cost && min_perform > Qf) {
-//			if(min_perform > Qf) {
-//	//			cout<<"A - "<<c<<"的cost变少了："<<" "<<Allocated_Chains[c].cost<<" "<<Allocated_Chains[c].update_cost<<endl;
-//				min_perform = Qf;
-//				update_chain = c + NUM_OF_INPUT_CHAINS;
-//				update_ins = ins;
-//				update_cost = new_cost;
-//			}
-//		}
-//	}
-//	
-////	cout << "未更新前的 T ——" << T << endl;
-////	printUsage();
-////	cout << endl;
-//	if(update_chain >= NUM_OF_INPUT_CHAINS) {
-////		cout<<"更新 A  "<<update_chain - NUM_OF_INPUT_CHAINS<<" "<<update_ins<<endl;
-////		cout<<Allocated_Chains[update_chain - NUM_OF_INPUT_CHAINS].node<<" "<<Allocated_Chains[update_chain - NUM_OF_INPUT_CHAINS].update[update_ins].unode<<endl;
-//		update(update_chain - NUM_OF_INPUT_CHAINS, Allocated_Chains, update_ins, update_cost);
-////		cout<<"done！"<<endl;
-//	}
-//	else if(update_chain >= 0){
-////		cout<<"更新 I  "<<update_chain<<" "<<update_ins<<endl;
-////		cout<<Input_Chains[update_chain].node<<" "<<Input_Chains[update_chain].update[update_ins].unode<<endl;
-//		update(update_chain, Input_Chains, update_ins, update_cost);
-////		cout<<"done！"<<endl;
-//	}
-//	else {
-////		cout<<"没有更新"<<T<<endl;
-//		return;
-//	}
-//}
-
 int main() {
 	srand((unsigned)time(NULL));    // 随机种子调用一次即可
 	
@@ -740,16 +494,13 @@ int main() {
     start = GetTickCount(); 
     stop1 = start;
 //    printRS();
-
-	// 选择参与此次调整的已分配服务链 
-	classify();
-	// 将所有参与分配的先选一种初始配置 
+	// 将所有新服务链的先选一种初始配置 
 	init();
 //	cout << "init over" << endl;
 
 //	printRS();
 //	printChoice();
-	printUsage();
+//	printUsage();
 
 	totalCost();
 	cout << T << endl;
@@ -757,22 +508,20 @@ int main() {
 //	printRS();
 
 //	printBW();
-
-
+	// 选择参与此次调整的已分配服务链 
+	classify();
+//	
 	// 策略更新 
-	for(int times = 0; times < 200; ++times) {
+	for(int times = 0; times < 30; ++times) {
 //		cout<<"第"<<times<<"次："<<endl;
 //		printRS();
-//		stop2 = GetTickCount();  
-//		if((stop2 - stop1) >= 10) {
-//			printf("\n运行时间: %lld ms\n", stop2 - start);
-//			cout << T << endl;
-//			stop1 = stop2;
-//		}
-		action();
-		if((times+1)%25 == 0) {
-			cout << "迭代第" << times+1 << "次：" << T << endl;
+		stop2 = GetTickCount();  
+		if((stop2 - stop1) >= 10) {
+			printf("\n运行时间: %lld ms\n", stop2 - start);
+			cout << T << endl;
+			stop1 = stop2;
 		}
+		action();
 //		printUsage();
 //		cout<<endl;
 	}

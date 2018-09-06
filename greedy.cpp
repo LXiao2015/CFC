@@ -13,7 +13,7 @@ void swap(int array[], int i, int j) {
     array[j] = temp;  
 }
 
-void sortMaxLeftMemCloud(int cloud[], int n) {
+void sortMinCostCloud(int cloud[], int n) {
 	for(int i = 0; i < n - 1; i++) {  
         for(int j = i + 1; j < n; j++) {  
             if(node_using_cost[cloud[i]-42] > node_using_cost[cloud[j]-42])  
@@ -27,7 +27,7 @@ void sortMaxLeftMemCloud(int cloud[], int n) {
 
 void chooseLargestNode(int i, bool *nf_done, struct CFC Chains[], int type, int ins) {
 	Chains[i].update[ins].succ = true;
-//	cout<<"第"<<i+1<<"条服务链："<<type<<" "<<Chains[i].ins<<" "<<ins<<endl; 
+	cout<<"第"<<i+1<<"条服务链："<<type<<" "<<Chains[i].ins<<" "<<ins<<endl; 
 
 	int phy = 0;    // 第 n 个物理特征
 	for(int f : phy_feature_set) {
@@ -43,7 +43,7 @@ void chooseLargestNode(int i, bool *nf_done, struct CFC Chains[], int type, int 
 			if(type < 2) {
 				Chains[i].update[ins].unode = 41;
 				if(!checkCapacity(Chains, i, ins)) {
-//					cout<<"新节点41用不了"<<endl;
+					cout<<"新节点41用不了"<<endl;
 					Chains[i].update[ins].unode = Chains[i].node;
 				}
 				else return;
@@ -57,21 +57,21 @@ void chooseLargestNode(int i, bool *nf_done, struct CFC Chains[], int type, int 
 //					Chains[i].update[ins].unode = 44; break;
 //				default: Chains[i].update[ins].unode = 45; break;
 //			} 
-			int maxLeftMemCloud[4] = {42, 43, 44, 45};
-			sortMaxLeftMemCloud(maxLeftMemCloud, 4);
+			int minCostCloud[4] = {42, 43, 44, 45};
+			sortMinCostCloud(minCostCloud, 4);
 			
 			Chains[i].update[ins].uphy = phy;
 
 			for(int node = 0; node < 4; node++) {
-				Chains[i].update[ins].unode = maxLeftMemCloud[node];
+				Chains[i].update[ins].unode = minCostCloud[node];
 				if(!checkCapacity(Chains, i, ins)) {
 					Chains[i].update[ins].succ = false; 
-//					cout<<"节点不能用"<<endl;
+					cout<<"节点不能用"<<endl;
 				}
 					
 				else {	
 					Chains[i].update[ins].succ = true;
-//					cout<<"节点能用"<<endl;
+					cout<<"节点能用"<<endl;
 					return;
 				}
 			}
@@ -198,11 +198,11 @@ void chooseShortestPath(int i, bool *nf_done, struct CFC Chains[], int ins, int 
 
 		Chains[i].update[ins].uphy = Chains[i].phy;
 		Chains[i].update[ins].succ = false;
-//		cout<<"不够分配"<<endl;
+		cout<<"不够分配"<<endl;
 	}
 	else {
 		Chains[i].update[ins].succ &= true;
-//		cout<<"路径分配成功！"<<endl;
+		cout<<"路径分配成功！"<<endl;
 	}
 //	cout<<Chains[i].update_node<<endl;
 //	for(int step = 0; step < MAX_PATH_LENGTH; ++step) {
@@ -222,23 +222,23 @@ void init() {
 		int ins = num_of_ins[type] - 1;    // 选择最贪婪的实现方式
 //		Input_Chains[i].ins = ins;
 //		cout<<"I 初始 - "<<i<<endl;
-		while(ins >= 0) {
-			if(ins > 0) {
+//		while(ins >= 0) {
+//			if(ins > 0) {
 				chooseLargestNode(i, &nf_done, Input_Chains, type, ins);   // 失败后恢复 
 				if(Input_Chains[i].update[ins].succ != false) {
 					// 挑选路径
 					int pathno = 0;
 					chooseShortestPath(i, &nf_done, Input_Chains, ins, pathno);   // 失败后恢复
-					while(Input_Chains[i].update[ins].succ == false) {
-						pathno++;
-						chooseShortestPath(i, &nf_done, Input_Chains, ins, pathno);
-					}
+//					while(Input_Chains[i].update[ins].succ == false) {
+//						pathno++;
+//						chooseShortestPath(i, &nf_done, Input_Chains, ins, pathno);
+//					}
 				}
-			} 
-			else {
-				Input_Chains[i].fT = singleCost(i, Input_Chains, ins);    // 无论成功失败都要计算开销
-				nf_done = true;
-			}
+//			} 
+//			else {
+//				Input_Chains[i].fT = singleCost(i, Input_Chains, ins);    // 无论成功失败都要计算开销
+//				nf_done = true;
+//			}
 			if(Input_Chains[i].update[ins].succ != false) {
 				// 扣除资源和带宽 
 				
@@ -252,13 +252,13 @@ void init() {
 				
 				Input_Chains[i].fT = singleCost(i, Input_Chains, ins);    // 无论成功失败都要计算开销
 //				cout << "计算COST：" << Input_Chains[i].fT;
-				break;	
+//				break;	
 			}
 			else {
 				Input_Chains[i].fT = singleCost(i, Input_Chains, 0);
-				ins--;
+//				ins--;
 			}	
-		}	 
+//		}	 
 	}
 } 
 
@@ -271,7 +271,7 @@ int main() {
 //	cout << "read over" << endl;
 	printRS();
 //	printBW();
-//	printUsage();
+	printUsage();
 	DWORD start, stop1 = 0, stop2;  
     start = GetTickCount(); 
     stop1 = start;

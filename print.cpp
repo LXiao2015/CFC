@@ -65,15 +65,23 @@ void printUsage() {
 }
 
 void printCost() {
-	float CR = 0.0, CI = 0.0, C;
+	double CR = 0.0, CI = 0.0, C = 0.0, cff = 0.0;
 	for(int i = 0; i < NUM_OF_INPUT_CHAINS; ++i) {
 		C += Input_Chains[i].fT;
+		for(int j = 0; j < NUM_OF_FEATURES; ++j) {
+			cff += (chain_types[Input_Chains[i].service_type][Input_Chains[i].ins][j] == true)? 0: feature_failure_cost[Input_Chains[i].service_type][j];
+		}
 	}
 
 	for(int c = 0; c < NUM_OF_ALLOCATED_CHAINS; ++c) {
 		C += Allocated_Chains[c].fT;
+		for(int j = 0; j < NUM_OF_FEATURES; ++j) {
+			cff += (chain_types[Allocated_Chains[c].service_type][Allocated_Chains[c].ins][j] == true)? 0: feature_failure_cost[Allocated_Chains[c].service_type][j];
+		}
 	}
-	cout << C << " + ";
+	
+//	CF = chain_failure_cost[Input_Chains[i].service_type];
+	cout << cff << " + " << C - cff << " + ";
 	
 	for(int i = 0; i < NUM_OF_NFNODES; ++i) {
 		CR += (node_used[i] > 0? 1: 0) * node_using_cost[i];
